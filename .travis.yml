@@ -9,6 +9,7 @@ services:
 
 # wait for elasticsearh to start up
 before_script:
+  - chmod -w ./test/spool.nowrite
   - sleep 10
 
 after_success:

@@ -10,7 +10,7 @@ describe('log-ship-elasticsearch-postfix', function () {
     var Ship = shipper.createShipper('./test');
 
     describe('config', function () {
-        it('finds a log-ship-elasticsearch-postfix.ini', function (done) {        
+        it('finds a log-ship-elasticsearch-postfix.ini', function (done) {
             assert.ok(Ship);
             done();
         });
