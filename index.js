@@ -1,8 +1,10 @@
 'use strict';
 
+// node built-ins
 var fs        = require('fs');
 var path      = require('path');
 
+// npm modules
 var ini       = require('ini');
 
 function PostfixToElastic (etcDir) {
@@ -104,8 +106,10 @@ PostfixToElastic.prototype.isWritable = function(dir, done) {
 
 PostfixToElastic.prototype.isWritablePreV12 = function(dir, done) {
 	if (!done) {
+		var tmpFile = path.resolve(dir, '.tmp');
 		try {
-			fs.readdirSync(dir);
+			fs.writeFileSync(tmpFile, 'write test');
+			fs.unlinkSync(tmpFile);
 		}
 		catch (e) {
 			return false;
@@ -113,12 +117,14 @@ PostfixToElastic.prototype.isWritablePreV12 = function(dir, done) {
 		return true;
 	}
 
-	fs.readdir(dir, function (err) {
+	fs.writeFile(tmpFile, 'write test', function (err) {
 		if (err) {
 			console.error('ERROR: spool dir is not writable: ' + err.code);
 			return done(err);
 		}
-		done(err, true);
+		fs.unlink(tmpFile, function(err) {
+			done(err, true);
+		});
 	});
 };
 
