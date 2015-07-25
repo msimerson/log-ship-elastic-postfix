@@ -1,0 +1,20 @@
+{
+  "name": "log-ship-elasticsearch-postfix",
+  "description": "Ship normalized Postfix logs to Elasticsearch",
+  "version": "0.0.1",
+  "private": false,
+  "dependencies": {
+    "async": "^1.3.0",
+    "elasticsearch": "*",
+    "safe-log-reader": "*",
+    "postfix-parser": "*",
+    "ini": "^1.3.4"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  },
+  "scripts": {
+    "start": "node postfix-to-elasticsearch.js",
+    "test": "mocha"
+  }
+}
