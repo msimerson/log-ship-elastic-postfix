@@ -82,9 +82,7 @@ PostfixToElastic.prototype.isDirectory = function(dir, done) {
 };
 
 PostfixToElastic.prototype.isWritable = function(dir, done) {
-	if (!fs.access) {
-		return this.isWritablePreV12(dir, done);
-	}
+	if (!fs.access) { return this.isWritablePreV12(dir, done); }
 	if (!done) {
 		try {
 			fs.accessSync(dir, fs.W_OK);

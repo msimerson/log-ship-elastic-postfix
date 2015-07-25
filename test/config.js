@@ -29,7 +29,7 @@ describe('log-ship-elasticsearch-postfix', function () {
         });
 
         it('spool dir is writable', function (done) {
-            fs.access(Ship.cfg.main.spool, fs.W_OK, function(err) {
+            Ship.isWritable(Ship.cfg.main.spool, function (err) {
                 assert.ifError(err);
                 done();
             });
