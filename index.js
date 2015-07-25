@@ -82,6 +82,9 @@ PostfixToElastic.prototype.isDirectory = function(dir, done) {
 };
 
 PostfixToElastic.prototype.isWritable = function(dir, done) {
+	if (!fs.access) {
+		return this.isWritablePreV12(dir, done);
+	}
 	if (!done) {
 		try {
 			fs.accessSync(dir, fs.W_OK);
@@ -93,6 +96,26 @@ PostfixToElastic.prototype.isWritable = function(dir, done) {
 	}
 
 	fs.access(dir, fs.W_OK, function (err) {
+		if (err) {
+			console.error('ERROR: spool dir is not writable: ' + err.code);
+			return done(err);
+		}
+		done(err, true);
+	});
+};
+
+PostfixToElastic.prototype.isWritablePreV12 = function(dir, done) {
+	if (!done) {
+		try {
+			fs.readdirSync(dir);
+		}
+		catch (e) {
+			return false;
+		}
+		return true;
+	}
+
+	fs.readdir(dir, function (err) {
 		if (err) {
 			console.error('ERROR: spool dir is not writable: ' + err.code);
 			return done(err);
