@@ -1,10 +1,9 @@
 [![Build Status][ci-img]][ci-url]
 [![Coverage Status][cov-img]][cov-url]
 
-
 # Ship Postfix Logs to Elasticsearch
 
-Read lines from log files, parse them to a normalized format, and save them to Elasticsearch.
+Parses postfix log files from log files into a normalized JSON document and saves them to Elasticsearch.
 
 ## Install
 
