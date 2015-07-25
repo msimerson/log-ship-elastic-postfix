@@ -3,6 +3,14 @@
   "description": "Ship normalized Postfix logs to Elasticsearch",
   "version": "0.0.1",
   "private": false,
+  "homepage": "https://github.com/DoubleCheck/log-ship-elasticsearch-postfix",
+  "bugs": {
+    "url": "https://github.com/DoubleCheck/log-ship-elasticsearch-postfix/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DoubleCheck/log-ship-elasticsearch-postfix.git"
+  },
   "dependencies": {
     "async": "^1.3.0",
     "elasticsearch": "*",
@@ -14,7 +22,7 @@
     "mocha": "^2.2.5"
   },
   "scripts": {
-    "start": "node postfix-to-elasticsearch.js",
+    "start": "node index.js",
     "test": "mocha"
   }
 }

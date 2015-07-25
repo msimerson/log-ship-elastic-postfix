@@ -9,6 +9,10 @@ describe('log-ship-elasticsearch-postfix', function () {
             done();
         });
 
+        it('config has required sections', function (done) {
+            done();
+        });
+
         it('determines the spool dir', function (done) {
             done();
         });
