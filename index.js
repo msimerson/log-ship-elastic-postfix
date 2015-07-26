@@ -19,11 +19,22 @@ function PostfixToElastic (etcDir) {
 	console.log(this.eshosts);
 	this.elastic = new esm.Client({
 		hosts: this.eshosts,
-		log: 'trace',
+		// log: 'trace',
 	});
 
+	var consumeLogs = function (data) {
+		console.log(data);
+	};
 
-
+	var read = require(this.cfg.reader.module);
+	this.reader = read.createReader(this.cfg.reader.file, {
+		noBookmark: true,
+		bookmark: {
+			dir: path.resolve(this.spool, '.bookmark'),
+		}
+	})	
+    // .on('readable', function () { this.read(); })
+	.on('read', consumeLogs);
 }
 
 
@@ -105,8 +116,8 @@ PostfixToElastic.prototype.isWritable = function(dir, done) {
 };
 
 PostfixToElastic.prototype.isWritablePreV12 = function(dir, done) {
+	var tmpFile = path.resolve(dir, '.tmp');
 	if (!done) {
-		var tmpFile = path.resolve(dir, '.tmp');
 		try {
 			fs.writeFileSync(tmpFile, 'write test');
 			fs.unlinkSync(tmpFile);

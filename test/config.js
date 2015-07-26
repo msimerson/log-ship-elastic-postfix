@@ -78,6 +78,18 @@ describe('log-ship-elasticsearch-postfix', function () {
         }
     });
 
+    describe.only('reader', function () {
+        it('should load', function (done) {
+            assert.ok(Ship.reader);
+            done();
+        });
+
+        it('is readable', function (done) {
+            assert.ok(Ship.reader.liner.readable);
+            done();
+        });
+    });
+
     describe('fs utilities', function () {
         it('isDirectory reports true for dir', function (done) {
             assert.equal(
