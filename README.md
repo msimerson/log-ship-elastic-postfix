@@ -12,7 +12,7 @@ Parses postfix log files from log files into a normalized JSON document and save
 
 ## Features
 
-
+- [x] drop in modules for: reader, parser, and elasticsearch
 - [x] config file is human friendly ini
 
 
