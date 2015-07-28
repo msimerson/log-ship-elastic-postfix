@@ -26,7 +26,8 @@ function PostfixToElastic (etcDir) {
 	});
 
 	this.queue = [];
-	
+	this.pfDocs = {};
+
 	var p2e = this;
 
 	var logRead = function (data) {
@@ -85,7 +86,6 @@ function emitParseError(prog, msg) {
 
 PostfixToElastic.prototype.doQueue = function() {
 	var p2e = this;
-	this.pfDocs = {};
 
 	if (this.queue.length === 0) {
 		return this.doneQueue('doQueue: no items in queue');
@@ -104,6 +104,7 @@ PostfixToElastic.prototype.doQueue = function() {
 				console.log('saveResultsToEs returned');
 				console.log(arguments);
 				if (err) return p2e.doneQueue(err);
+				p2e.pfDocs = {}; // safely committed to ES, reset
 				p2e.doneQueue(null, res);
 			});
 		});
@@ -153,6 +154,7 @@ PostfixToElastic.prototype.populatePfdocsFromEs = function(done) {
         	p2e.pfDocs[qid] = res.hits.hits[i]._source;
         	p2e.pfDocs[qid]._id = res.hits.hits[i]._id;
         }
+        // console.log(p2e.pfDocs);
         done();
 	});
 };
@@ -162,7 +164,7 @@ PostfixToElastic.prototype.updatePfDocs = function(done) {
 	for (var j = 0; j < this.queue.length; j++) {
 		var logObj = this.queue[j];
 		var qid    = logObj.qid;
-		console.log(logObj);
+		// console.log(logObj);
 
 		// default document template
 		if (!this.pfDocs[qid]) this.pfDocs[qid] = {
@@ -183,7 +185,7 @@ PostfixToElastic.prototype.saveResultsToEs = function(done) {
 	console.log(util.inspect(this.pfDocs, {depth: null}));
 	var esBulk = [];  // index, create, update
 
-	Object.keys(this.pfDocs).forEach(function (qid) {
+	Object.keys(p2e.pfDocs).forEach(function (qid) {
 		var doc = p2e.pfDocs[qid];
 
 		if (doc._id) {
