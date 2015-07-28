@@ -14,9 +14,10 @@
   "dependencies": {
     "async": "^1.3.0",
     "elasticsearch": "*",
-    "safe-log-reader": "*",
+    "ini": "^1.3.4",
+    "moment": "^2.10.6",
     "postfix-parser": "*",
-    "ini": "^1.3.4"
+    "safe-log-reader": "*"
   },
   "devDependencies": {
     "blanket": "^1.1.7",
