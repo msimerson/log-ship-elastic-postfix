@@ -4,7 +4,8 @@ var assert  = require('assert');
 var fs      = require('fs');
 var path    = require('path');
 
-var shipper = require('../index');
+var shipper  = require('../index');
+var hostName = require('os').hostname();
 
 describe('log-ship-elasticsearch-postfix', function () {
     var Ship = shipper.createShipper('./test');
@@ -59,7 +60,6 @@ describe('log-ship-elasticsearch-postfix', function () {
             done();
         });
 
-        var hostName = require('os').hostname();
         if (/(?:travis|tworker|dev-test)/.test(hostName)) {
 
             it('connects to configured ES host', function (done) {
