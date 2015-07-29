@@ -236,6 +236,7 @@ PostfixToElastic.prototype.saveResultsToEs = function(done) {
         if (err) return done(err);
         if (res.errors) {
             console.log(util.inspect(res.errors, {depth: null}));
+            return done('bulk errors, see logs');
         }
         done(null, res);
     });
