@@ -13,7 +13,7 @@ function PostfixToElastic (etcDir) {
     this.cfg    = this.loadConfig(etcDir);
     this.spool  = this.cfg.main.spool || '/var/spool/log-ship';
     this.validateSpoolDir();
-    this.batchLimit = 100;
+    this.batchLimit = this.cfg.elastic.batch || 1024;
 
     this.queue = [];
     this.pfDocs = {};
@@ -62,6 +62,7 @@ PostfixToElastic.prototype.readLogLine = function (data, lineCount) {
     var syslogObj = p2e.parser.asObject('syslog', data);
     if (!syslogObj || !syslogObj.prog) {
         emitParseError('syslog', data);
+        return;
     }
     // console.log(syslogObj);
     if (!/^postfix/.test(syslogObj.prog)) return; // not postfix, ignore
@@ -128,7 +129,11 @@ PostfixToElastic.prototype.doQueue = function(done) {
                 if (err) return p2e.doneQueue(err);
                 console.log('\t\tdocs saved to ES');
                 p2e.doneQueue(null, res);
-                if (done) done();
+                if (!done) return;
+                console.log('giving ES 15s to sync');
+                setTimeout(function () {
+                    done();
+                }, 15 * 1000);
             });
         });
     });
