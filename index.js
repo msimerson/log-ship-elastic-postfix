@@ -15,6 +15,10 @@ function PostfixToElastic (etcDir) {
     this.validateSpoolDir();
     this.batchLimit = 100;
 
+    this.queue = [];
+    this.pfDocs = {};
+    this.queueActive = false;
+
     this.parser = require(this.cfg.parser.module);
 
     var esm = require(this.cfg.elastic.module);
@@ -25,34 +29,35 @@ function PostfixToElastic (etcDir) {
         // log: 'trace',
     });
 
-    this.queue = [];
-    this.pfDocs = {};
-    this.queueActive = false;
-
     var p2e = this;
-
-    var read = require(this.cfg.reader.module);
-    this.reader = read.createReader(this.cfg.reader.file, {
-        batchLimit: p2e.batchLimit,
-        bookmark: {
-            dir: path.resolve(this.spool, '.bookmark'),
+    this.elastic.ping(function (err, res) {
+        if (err) {
+            console.error(err);
+            return;
         }
-    })
-    .on('readable', function () { this.read(); })
-    .on('read', p2e.readLogLine.bind(this))
-    .on('end', function (done) {
-        console.log('reader end');
-        p2e.doQueue(done);
-    })
-    .on('error', function () {
-        console.log('reader error');
-        console.error(err);
-    });
+
+        var read = require(p2e.cfg.reader.module);
+        p2e.reader = read.createReader(p2e.cfg.reader.file, {
+            batchLimit: p2e.batchLimit,
+            bookmark: {
+                dir: path.resolve(p2e.spool, '.bookmark'),
+            }
+        })
+        .on('readable', function () { this.read(); })
+        .on('read', p2e.readLogLine.bind(p2e))
+        .on('end', function (done) {
+            console.log('reader end');
+            p2e.doQueue(done);
+        })
+        .on('error', function () {
+            console.log('reader error');
+            console.error(err);
+        });
+    }.bind(this));
 }
 
 PostfixToElastic.prototype.readLogLine = function (data, lineCount) {
     var p2e = this;
-    console.log(lineCount + ': ' + data);
 
     var syslogObj = p2e.parser.asObject('syslog', data);
     if (!syslogObj || !syslogObj.prog) {
@@ -61,6 +66,7 @@ PostfixToElastic.prototype.readLogLine = function (data, lineCount) {
     // console.log(syslogObj);
     if (!/^postfix/.test(syslogObj.prog)) return; // not postfix, ignore
     // console.log(syslogObj);
+    console.log(lineCount + ': ' + data);
     var parsed = p2e.parser.asObject(syslogObj.prog, syslogObj.msg);
     ['host','prog'].forEach(function (f) {
         if (!syslogObj[f]) return;
@@ -82,7 +88,6 @@ PostfixToElastic.prototype.doneQueue = function(err) {
     }
 
     console.error(err);
-    console.error('pausing 15s');
     setTimeout(function () {
         p2e.doQueue();  // retry
     }, 15 * 1000);
@@ -345,6 +350,15 @@ PostfixToElastic.prototype.validateSpoolDir = function(done) {
         if (this.isDirectory(this.spool) && this.isWritable(this.spool)) {
             return true;
         }
+        if (!this.isDirectory(this.spool)) {
+            var parentDir = path.dirname(this.spool);
+            console.log('parent dir: ' + parentDir);
+            if (!this.isDirectory(parentDir)) {
+                fs.mkdir(parentDir);
+            }
+            fs.mkdir(this.spool);
+        }
+
         return false;
     }
 
@@ -358,7 +372,14 @@ PostfixToElastic.prototype.validateSpoolDir = function(done) {
 };
 
 PostfixToElastic.prototype.isDirectory = function(dir, done) {
-    if (!done) return fs.statSync(dir).isDirectory();
+    if (!done) {
+        try {
+            var stat = fs.statSync(dir);
+        }
+        catch (ignore) {}
+        if (!stat) return false;
+        return stat.isDirectory();
+    }
 
     fs.stat(dir, function (err, stats) {
         if (err) {
