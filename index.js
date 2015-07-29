@@ -68,6 +68,10 @@ PostfixToElastic.prototype.readLogLine = function (data, lineCount) {
     // console.log(syslogObj);
     console.log(lineCount + ': ' + data);
     var parsed = p2e.parser.asObject(syslogObj.prog, syslogObj.msg);
+    if (!parsed) {
+        emitParseError(syslogObj.prog, syslogObj.msg);
+        return;
+    }
     ['host','prog'].forEach(function (f) {
         if (!syslogObj[f]) return;
         parsed[f] = syslogObj[f];
@@ -263,7 +267,8 @@ PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
         case 'postfix/qmgr':    // a queue event (1+ per msg)
             if (lo.action === 'removed') {
                 doc.isFinal = true;
-                this.addEvent({ qid: lo.qid, date: lo.date, action: 'removed' });
+                this.addEvent({ qid: lo.qid,
+                    date: lo.date, action: 'removed' });
                 return;
             }
 
@@ -352,9 +357,9 @@ PostfixToElastic.prototype.validateSpoolDir = function(done) {
             var parentDir = path.dirname(this.spool);
             console.log('parent dir: ' + parentDir);
             if (!this.isDirectory(parentDir)) {
-                fs.mkdir(parentDir);
+                fs.mkdirSync(parentDir);
             }
-            fs.mkdir(this.spool);
+            fs.mkdirSync(this.spool);
         }
 
         return false;
