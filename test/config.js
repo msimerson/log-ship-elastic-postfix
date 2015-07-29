@@ -60,8 +60,7 @@ describe('log-ship-elasticsearch-postfix', function () {
         });
 
         var hostName = require('os').hostname();
-        if (/travis|tworker|dev-test/.test(hostName)) {
-
+        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
 
             it('connects to configured ES host', function (done) {
 
@@ -79,17 +78,24 @@ describe('log-ship-elasticsearch-postfix', function () {
     });
 
     describe('reader', function () {
-        it('should load', function (done) {
-            assert.ok(Ship.reader);
-            done();
-        });
 
-        it('is readable', function (done) {
-            assert.ok(Ship.reader.liner.readable || Ship.queue.length);
-            // console.log(Ship.reader.liner.readable);
-            // console.log(Ship.queue);
-            done();
-        });
+        // these don't load unless an ES connection is available
+        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
+
+            it('should load', function (done) {
+                assert.ok(Ship.reader);
+                done();
+            });
+
+            if (Ship.reader) {
+                it('is readable', function (done) {
+                    assert.ok(Ship.reader.liner && (Ship.reader.liner.readable || Ship.queue.length));
+                    // console.log(Ship.reader.liner.readable);
+                    // console.log(Ship.queue);
+                    done();
+                });
+            }
+        }
     });
 
     describe('fs utilities', function () {

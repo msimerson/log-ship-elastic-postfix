@@ -274,7 +274,7 @@ PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
                     this.addEvent(lo);
                     return;
                 }
-                emitParseError('qmgr', lo.msg);
+                emitParseError('qmgr', JSON.stringify(lo));
                 return;
             }
 
@@ -305,10 +305,8 @@ PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
             });
             return;
         case 'postfix/scache':
-            if (lo.msg.substr(0,10) === 'statistics') {
-                return;
-            }
-            emitParseError(lo.prog, lo.msg);
+            if (lo.statistics) return;
+            emitParseError('scache', JSON.stringify(lo));
             return;
         case 'postfix/pickup':   // tells us the uid
             doc.uid = lo.uid;
