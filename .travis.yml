@@ -8,6 +8,12 @@ os:
     - linux
     - osx
 
+matrix:
+    allow_failures:
+        - os: osx
+        - node_js: "iojs"
+    fast_finish: true
+
 services:
     - elasticsearch
 
