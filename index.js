@@ -285,35 +285,7 @@ PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
 
     switch (lo.prog) {
         case 'postfix/qmgr':    // a queue event (1+ per msg)
-            if (lo.action === 'removed') {
-                doc.isFinal = true;
-                this.addDocEvent({ qid: lo.qid,
-                    date: lo.date, action: 'removed' });
-                return;
-            }
-
-            if (lo.status) {
-                if (/expired, returned/.test(lo.status)) {
-                    lo.action = 'expired';
-                    delete lo.status;
-                    this.addDocEvent(lo);
-                    return;
-                }
-                emitParseError('qmgr', JSON.stringify(lo));
-                return;
-            }
-
-            // qmgr did something with the queued message
-            lo.action = 'queued';
-
-            if (lo.from === undefined) lo.from = ''; // null sender
-            ['from','size','nrcpt'].forEach(function (field) {
-                doc[field] = lo[field];
-                delete lo[field];
-            });
-
-            this.addDocEvent(lo);
-            return;
+            return this.addToPostfixDocQmgr(doc, lo);
         case 'postfix/smtp':    // a delivery attempt
                ['delay','delays'].forEach(function (field) {
                 if (lo[field] === undefined) return;
@@ -345,6 +317,38 @@ PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
         case 'postfix/local':    // a local process injected a message
             break;
     }
+    this.addDocEvent(lo);
+};
+
+PostfixToElastic.prototype.addToPostfixDocQmgr = function(doc, lo) {
+
+    if (lo.action === 'removed') {
+        doc.isFinal = true;
+        this.addDocEvent({ qid: lo.qid,
+            date: lo.date, action: 'removed' });
+        return;
+    }
+
+    if (lo.status) {
+        if (/expired, returned/.test(lo.status)) {
+            lo.action = 'expired';
+            delete lo.status;
+            this.addDocEvent(lo);
+            return;
+        }
+        emitParseError('qmgr', JSON.stringify(lo));
+        return;
+    }
+
+    // qmgr did something with the queued message
+    lo.action = 'queued';
+
+    if (lo.from === undefined) lo.from = ''; // null sender
+    ['from','size','nrcpt'].forEach(function (field) {
+        doc[field] = lo[field];
+        delete lo[field];
+    });
+
     this.addDocEvent(lo);
 };
 
