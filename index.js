@@ -7,7 +7,7 @@ var util      = require('util');
 
 // npm modules
 var ini       = require('ini');
-var moment    = require('moment');
+var moment    = require('moment-timezone');
 
 if (process.env.COVERAGE) require('blanket');
 
@@ -19,6 +19,8 @@ function PostfixToElastic (etcDir) {
     this.queue = [];
     this.pfDocs = {};
     this.queueActive = false;
+
+    moment.tz.setDefault(this.cfg.parser.timezone || 'America/Phoenix');
 
     // initialize spool dir, parser and elasticsearch
     this.validateSpoolDir();
