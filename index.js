@@ -11,6 +11,10 @@ var util      = require('util');
 var ini       = require('ini');
 var moment    = require('moment-timezone');
 
+// local modules
+var spool     = require('./lib/spool');
+var postdoc   = require('./lib/postfix-doc');
+
 function PostfixToElastic (etcDir) {
     this.cfg    = this.loadConfig(etcDir);
     this.spool  = this.cfg.main.spool || '/var/spool/log-ship';
@@ -20,11 +24,15 @@ function PostfixToElastic (etcDir) {
     this.pfDocs = {};
     this.queueActive = false;
 
-    moment.tz.setDefault(this.cfg.parser.timezone || 'America/Phoenix');
+    // initialize spool dir
+    spool.isValidDir(this.spool);
 
-    // initialize spool dir, parser and elasticsearch
-    this.validateSpoolDir();
-    this.parser  = require(this.cfg.parser.module);
+    // initialize the parser
+    this.parser     = require(this.cfg.parser.module);
+    moment.tz.setDefault(this.cfg.parser.timezone || 'America/Phoenix');
+    this.parser.moment = moment;
+
+    // initialize Elasticsearch
     var esm      = require(this.cfg.elastic.module);
     this.eshosts = this.cfg.elastic.hosts.split(/[, ]+/);
     this.elastic = new esm.Client({
@@ -55,38 +63,16 @@ function PostfixToElastic (etcDir) {
         .on('end', function (done) {
             // console.log('reader end');
             p2e.doQueue(done);
-        })
-        .on('error', function () {
-            console.log('reader error');
-            console.error(err);
         });
     });
 }
 
 PostfixToElastic.prototype.readLogLine = function (data, lineCount) {
-    var p2e = this;
 
-    var syslogObj = p2e.parser.asObject('syslog', data);
-    if (!syslogObj || !syslogObj.prog) {
-        emitParseError('syslog', data);
-        return;
-    }
+    var parsed = postdoc.parseLine(this.parser, data, lineCount);
+    if (!parsed) return;
 
-    if (!/^postfix/.test(syslogObj.prog)) return; // not postfix, ignore
-
-    // console.log(lineCount + ': ' + data);
-    var parsed = p2e.parser.asObject(syslogObj.prog, syslogObj.msg);
-    if (!parsed) {
-        emitParseError(syslogObj.prog, syslogObj.msg);
-        return;
-    }
-
-    ['host','prog'].forEach(function (f) {
-        if (!syslogObj[f]) return;
-        parsed[f] = syslogObj[f];
-    });
-    parsed.date = moment(syslogObj.date, 'MMM DD HH:mm:ss').format();
-    p2e.queue.push(parsed);
+    this.queue.push(parsed);    
 };
 
 PostfixToElastic.prototype.doneQueue = function(err) {
@@ -105,10 +91,6 @@ PostfixToElastic.prototype.doneQueue = function(err) {
         p2e.doQueue();  // retry
     }, 15 * 1000);
 };
-
-function emitParseError(prog, msg) {
-    console.error('PARSE ERROR for ' + prog + ':' + msg);
-}
 
 PostfixToElastic.prototype.doQueue = function(done) {
     var p2e = this;
@@ -186,7 +168,7 @@ PostfixToElastic.prototype.populatePfdocsFromEs = function(done) {
         for (var i = 0; i < res.hits.hits.length; i++) {
             var qid = res.hits.hits[i]._source.qid;
             if (p2e.pfDocs[qid]) {
-                console.log('\tdupe');
+                console.error('\tdupe');
                 continue;
             }
             p2e.pfDocs[qid] = res.hits.hits[i]._source;
@@ -201,7 +183,6 @@ PostfixToElastic.prototype.updatePfDocs = function(done) {
     for (var j = 0; j < this.queue.length; j++) {
         var logObj = this.queue[j];
         var qid    = logObj.qid;
-        // console.log(logObj);
 
         // default document template
         if (!this.pfDocs[qid]) this.pfDocs[qid] = {
@@ -211,7 +192,7 @@ PostfixToElastic.prototype.updatePfDocs = function(done) {
             date:    logObj.date,
             isFinal: false,
         };
-        this.addToPostfixDoc(logObj);
+        postdoc.update(this.pfDocs[qid], logObj);
     }
     done();
 };
@@ -255,103 +236,6 @@ PostfixToElastic.prototype.saveResultsToEs = function(done) {
     });
 };
 
-PostfixToElastic.prototype.addDocEvent = function(e) {
-    var qid = e.qid;
-
-    if (e.action && e.action === 'queued') {
-        // every time postfix touches a message, it emits a qmgr. The first
-        // informs us when a message enters the queue, subsequent are useless.
-        for (var i=0; i<this.pfDocs[qid].events.length; i++) {
-            if (this.pfDocs[qid].events[i].action === 'queued') return;
-        }
-    }
-
-    ['qid','host','prog'].forEach(function (field) {
-        delete e[field];
-    });
-
-    // duplicate detection
-    for (var j=0; j<this.pfDocs[qid].events.length; j++) {
-        if (JSON.stringify(e) === JSON.stringify(this.pfDocs[qid].events[j])) {
-            return;  // don't save duplicate event
-        }
-    }
-
-    this.pfDocs[qid].events.push(e);
-};
-
-PostfixToElastic.prototype.addToPostfixDoc = function(lo) {
-    var doc = this.pfDocs[lo.qid];
-
-    switch (lo.prog) {
-        case 'postfix/qmgr':    // a queue event (1+ per msg)
-            return this.addToPostfixDocQmgr(doc, lo);
-        case 'postfix/smtp':    // a delivery attempt
-               ['delay','delays'].forEach(function (field) {
-                if (lo[field] === undefined) return;
-                doc[field] = lo[field];
-                delete lo[field];
-            });
-            // doc.date = lo.date;
-            this.addDocEvent(lo);
-            return;
-        case 'postfix/cleanup':
-            ['message-id','resent-message-id'].forEach(function (h) {
-                if (lo[h] === undefined) return;
-                doc[h] = lo[h];
-            });
-            return;
-        case 'postfix/scache':
-            if (lo.statistics) return;
-            emitParseError('scache', JSON.stringify(lo));
-            return;
-        case 'postfix/pickup':   // tells us the uid
-            doc.uid = lo.uid;
-            return;
-        case 'postfix/error':
-            lo.action = 'error';
-            break;
-        case 'postfix/bounce':
-            lo.action = 'bounced';
-            break;
-        case 'postfix/local':    // a local process injected a message
-            break;
-    }
-    this.addDocEvent(lo);
-};
-
-PostfixToElastic.prototype.addToPostfixDocQmgr = function(doc, lo) {
-
-    if (lo.action === 'removed') {
-        doc.isFinal = true;
-        this.addDocEvent({ qid: lo.qid,
-            date: lo.date, action: 'removed' });
-        return;
-    }
-
-    if (lo.status) {
-        if (/expired, returned/.test(lo.status)) {
-            lo.action = 'expired';
-            delete lo.status;
-            this.addDocEvent(lo);
-            return;
-        }
-        emitParseError('qmgr', JSON.stringify(lo));
-        return;
-    }
-
-    // qmgr did something with the queued message
-    lo.action = 'queued';
-
-    if (lo.from === undefined) lo.from = ''; // null sender
-    ['from','size','nrcpt'].forEach(function (field) {
-        doc[field] = lo[field];
-        delete lo[field];
-    });
-
-    this.addDocEvent(lo);
-};
-
 PostfixToElastic.prototype.loadConfig = function(etcDir) {
     var file = 'log-ship-elasticsearch-postfix.ini';
     var candidates = [];
@@ -369,104 +253,6 @@ PostfixToElastic.prototype.loadConfig = function(etcDir) {
         }
         catch (ignore) {}
     }
-};
-
-PostfixToElastic.prototype.validateSpoolDir = function(done) {
-
-    if (!done) {
-        if (this.isDirectory(this.spool) && this.isWritable(this.spool)) {
-            return true;
-        }
-        if (!this.isDirectory(this.spool)) {
-            var parentDir = path.dirname(this.spool);
-            console.log('parent dir: ' + parentDir);
-            if (!this.isDirectory(parentDir)) {
-                fs.mkdirSync(parentDir);
-            }
-            fs.mkdirSync(this.spool);
-        }
-
-        return false;
-    }
-
-    this.isDirectory(this.spool, function (err) {
-        if (err) return done(err);
-        this.isWritable(this.spool, function (err) {
-            if (err) return done(err);
-            done(err, true);
-        });
-    }.bind(this));
-};
-
-PostfixToElastic.prototype.isDirectory = function(dir, done) {
-    if (!done) {
-        try {
-            var stat = fs.statSync(dir);
-        }
-        catch (ignore) {}
-        if (!stat) return false;
-        return stat.isDirectory();
-    }
-
-    fs.stat(dir, function (err, stats) {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                // TODO: make this recursive
-                console.log('mkdir: ' + dir);
-                fs.mkdir(dir, function (err) {
-                    if (err) return done(err);
-                    done(err, true);
-                });
-            }
-            return done(err);
-        }
-        return done(err, stats.isDirectory());
-    });
-};
-
-PostfixToElastic.prototype.isWritable = function(dir, done) {
-    if (!fs.access) { return this.isWritablePreV12(dir, done); }
-    if (!done) {
-        try {
-            fs.accessSync(dir, fs.W_OK);
-        }
-        catch (e) {
-            return false;
-        }
-        return true;
-    }
-
-    fs.access(dir, fs.W_OK, function (err) {
-        if (err) {
-            console.error('ERROR: spool dir is not writable: ' + err.code);
-            return done(err);
-        }
-        done(err, true);
-    });
-};
-
-PostfixToElastic.prototype.isWritablePreV12 = function(dir, done) {
-    var tmpFile = path.resolve(dir, '.tmp');
-    if (!done) {
-        try {
-            fs.writeFileSync(tmpFile, 'write test');
-            fs.unlinkSync(tmpFile);
-        }
-        catch (e) {
-            return false;
-        }
-        return true;
-    }
-
-    fs.writeFile(tmpFile, 'write test', function (err) {
-        if (err) {
-            console.error('ERROR: spool dir is not writable: ' + err.code);
-            return done(err);
-        }
-        fs.unlink(tmpFile, function(err) {
-            done(err, true);
-        });
-    });
 };
 
 module.exports = {
