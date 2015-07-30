@@ -47,57 +47,6 @@ describe('log-ship-elasticsearch-postfix', function () {
         });
     });
 
-    describe('parser', function () {
-        it('loads the specified parser', function (done) {
-            assert.ok(Ship.parser);
-            done();
-        });
-    });
-
-    describe('elasticsearch', function () {
-        it('loads the specified elasticsearch module', function (done) {
-            assert.ok(Ship.elastic);
-            done();
-        });
-
-        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
-
-            it('connects to configured ES host', function (done) {
-
-                Ship.elastic.ping({
-                    // ping usually has a 3000ms timeout 
-                    // requestTimeout: Infinity,
-                }, function (error) {
-                    if (error) {
-                       return done('elasticsearch cluster is down!');
-                    }
-                    done(error, 'All is well');
-                });
-            });
-        }
-    });
-
-    describe('reader', function () {
-
-        // these don't load unless an ES connection is available
-        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
-
-            it('should load', function (done) {
-                assert.ok(Ship.reader);
-                done();
-            });
-
-            if (Ship.reader) {
-                it('is readable', function (done) {
-                    assert.ok(Ship.reader.liner && (Ship.reader.liner.readable || Ship.queue.length));
-                    // console.log(Ship.reader.liner.readable);
-                    // console.log(Ship.queue);
-                    done();
-                });
-            }
-        }
-    });
-
     describe('fs utilities', function () {
         it('isDirectory reports true for dir', function (done) {
             assert.equal(

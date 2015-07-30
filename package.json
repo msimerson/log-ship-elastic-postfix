@@ -1,7 +1,7 @@
 {
   "name": "log-ship-elasticsearch-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "private": false,
   "homepage": "https://github.com/DoubleCheck/log-ship-elasticsearch-postfix",
   "bugs": {
@@ -27,7 +27,8 @@
   },
   "config": {
     "blanket": {
-      "pattern": "lib"
+      "pattern": "index.js",
+      "data-cover-never": [ "node_modules", "tests" ]
     }
   },
   "scripts": {

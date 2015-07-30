@@ -1,24 +1,49 @@
 'use strict';
 
-var shipper = require('../index');
+var assert   = require('assert');
+
+var shipper  = require('../index');
+var Ship     = shipper.createShipper('./test');
+var hostName = require('os').hostname();
 
 describe('log-ship-elasticsearch-postfix', function () {
-    describe('safe-log-reader', function () {
-        it('loads', function (done) {
 
-            done();
-        });
+    describe('reader', function () {
 
-        it('creates an instance for a test log file', function (done) {
-            done();
-        });
+        // these don't load unless an ES connection is available
+        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
 
-        it('reads the expected log lines', function (done) {
-        	done();
-        });
+            it('should load', function (done) {
+                assert.ok(Ship.reader);
+                done();
+            });
 
-        it('saves a bookmark', function (done) {
-        	done();
-        });
+            if (Ship.reader) {
+                it('is readable', function (done) {
+                    assert.ok(Ship.reader.liner &&
+                        (Ship.reader.liner.readable || Ship.queue.length));
+                    // console.log(Ship.reader.liner.readable);
+                    // console.log(Ship.queue);
+                    done();
+                });
+
+                it.skip('creates an instance for a test log file', function (done) {
+                    done();
+                });
+
+                it.skip('reads the expected log lines', function (done) {
+                    done();
+                });
+
+                it.skip('saves a bookmark', function (done) {
+                    done();
+                });
+            }
+        }
+        else {
+            it.skip('needs elasticsearch available', function (done) {
+                done();
+            });
+        }
     });
 });
