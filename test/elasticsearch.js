@@ -20,6 +20,7 @@ describe('log-ship-elasticsearch-postfix', function () {
         if (/(?:travis|worker|dev-test)/.test(hostName)) {
             // gotta have ES available to test these...
 
+            this.timeout(4000);
             it('can store an index map template', function (done) {
                 var filePath = path.resolve('index-map-template.json');
                 var indexMap;
@@ -31,10 +32,10 @@ describe('log-ship-elasticsearch-postfix', function () {
 
                     Ship.elastic.indices.delete({index: indexMap.template},
                     function (err) {
-                        if (err) console.error(err); // may not exist
+                        // if (err) console.error(err); // may not exist
                         Ship.elastic.indices.create({index: indexMap.template },
                         function (err, res) {
-                            if (err) console.error(err); // may already exist
+                            // if (err) console.error(err); // may already exist
 
                             Ship.elastic.indices.putMapping({
                                 index: indexMap.template,
@@ -44,9 +45,8 @@ describe('log-ship-elasticsearch-postfix', function () {
                                 if (err) console.error(err);
                                 // assert.ifError(err);
                                 // other tests are running, so currently
-                                // stored docs may conflict with map
-                                console.log(result);
-                                done(null, result);
+                                // stored mapping may conflict
+                                done();
                             });                        
                         });
                     });

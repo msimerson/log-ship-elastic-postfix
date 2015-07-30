@@ -1,4 +1,5 @@
 'use strict';
+/* jshint maxlen: 100 */
 
 var assert  = require('assert');
 var fs      = require('fs');
@@ -69,6 +70,18 @@ describe('log-ship-elasticsearch-postfix', function () {
         it('isWritable reports false for non-writable dir', function (done) {
             var spoolDir = path.resolve('./test', 'spool.nowrite');
             assert.equal(Ship.isWritable(spoolDir), false);
+            done();
+        });
+
+        it('isWritablePreV12 reports true for writable dir', function (done) {
+            var spoolDir = path.resolve('./test', 'spool');
+            assert.equal(Ship.isWritablePreV12(spoolDir), true);
+            done();
+        });
+
+        it('isWritablePreV12 reports false for non-writable dir', function (done) {
+            var spoolDir = path.resolve('./test', 'spool.nowrite');
+            assert.equal(Ship.isWritablePreV12(spoolDir), false);
             done();
         });
     });

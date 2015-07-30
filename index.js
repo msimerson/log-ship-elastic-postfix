@@ -1,5 +1,7 @@
 'use strict';
 
+if (process.env.COVERAGE) require('blanket');
+
 // node built-ins
 var fs        = require('fs');
 var path      = require('path');
@@ -8,8 +10,6 @@ var util      = require('util');
 // npm modules
 var ini       = require('ini');
 var moment    = require('moment-timezone');
-
-if (process.env.COVERAGE) require('blanket');
 
 function PostfixToElastic (etcDir) {
     this.cfg    = this.loadConfig(etcDir);
