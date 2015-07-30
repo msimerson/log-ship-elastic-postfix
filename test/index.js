@@ -9,7 +9,7 @@ var shipper  = require('../index');
 var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<system>, size=813, nrcpt=1 (queue active)';
 
 describe('log-ship-elasticsearch-postfix', function () {
-    
+
     it('configured parser loads', function (done) {
         var Ship     = shipper.createShipper('./test');
         assert.ok(Ship.parser);
@@ -120,11 +120,12 @@ describe('log-ship-elasticsearch-postfix', function () {
             assert.deepEqual(Ship.pfDocs['3mfHGL1r9gzyQP'], {
                 qid: '3mfHGL1r9gzyQP',
                 host: 'mx12',
-                events: 
-                [ { date: 'Jul  5 20:21:22', action: 'queued' },
-                { date: 'Jul 30 01:14:46',
-                    message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
-                action: 'bounced' } ],
+                events: [
+                    { date: 'Jul  5 20:21:22', action: 'queued' },
+                    { date: 'Jul 30 01:14:46',
+                      message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+                      action: 'bounced' }
+                ],
                 date: 'Jul  5 20:21:22',
                 isFinal: false,
                 from: 'system',
