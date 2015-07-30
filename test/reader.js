@@ -11,7 +11,7 @@ describe('log-ship-elasticsearch-postfix', function () {
     describe('reader', function () {
 
         // these don't load unless an ES connection is available
-        if (/(?:travis|tworker|dev-test)/.test(hostName)) {
+        if (/(?:travis|worker|dev-test)/.test(hostName)) {
 
             it('should load', function (done) {
                 assert.ok(Ship.reader);
@@ -42,6 +42,7 @@ describe('log-ship-elasticsearch-postfix', function () {
         }
         else {
             it.skip('needs elasticsearch available', function (done) {
+                console.log('hostname: ' + hostName);
                 done();
             });
         }
