@@ -28,7 +28,7 @@
   "config": {
     "blanket": {
       "pattern": "index.js",
-      "data-cover-never": [ "node_modules", "tests" ]
+      "data-cover-never": [ "node_modules", "test" ]
     }
   },
   "scripts": {
