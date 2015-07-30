@@ -1,4 +1,6 @@
+
 Jul  5 06:52:01 prd-mx1 spamd[11526]: spamd: identified spam (9.3/5.0) for nagios:1209 in 0.8 seconds, 5 bytes.
 Jul  5 06:52:11 prd-mx1 postfix/cleanup[21893]: 3mPVKl0Mhjz7sXv: message-id=<E1ZB06G-0006n5-Vp@anc-dev-web1.slc.example.net>
 Jul  5 06:52:11 prd-mx1 postfix/qmgr[20459]: 3mPVKl0Mhjz7sXv: from=<>, size=2666, nrcpt=2 (queue active)
 Jul  5 06:52:11 prd-mx1 postfix/smtp[22030]: 3mPVKl0Mhjz7sXv: to=<56597@continuity.delivery>, relay=10.2.2.85[10.2.2.85]:2527, delay=0.51, delays=0.44/0.01/0.05/0.01, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as 3mPVKl3YVXz2pS5Z)
+Jul 30 00:10:11 imac27 madeup: Gobbely Gook

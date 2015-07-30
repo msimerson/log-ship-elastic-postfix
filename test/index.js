@@ -52,7 +52,7 @@ describe('log-ship-elasticsearch-postfix', function () {
         // Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP:
         //      from=<system>, size=813, nrcpt=1 (queue active)
         var Ship     = shipper.createShipper('./test');
-        it('updates a postfix doc with a log line ', function (done) {
+        it('updates a postfix doc with a qmgr line ', function (done) {
             Ship.pfDocs['3mfHGL1r9gzyQP'] = {
                 qid:     '3mfHGL1r9gzyQP',
                 host:    'mx12',
@@ -78,6 +78,96 @@ describe('log-ship-elasticsearch-postfix', function () {
                 from: 'system',
                 size: 813,
                 nrcpt: 1,
+            },
+            util.inspect(Ship.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
+            done();
+        });
+
+        it('updates the postfix doc with a pickup line', function (done) {
+            Ship.addToPostfixDoc({
+                prog: 'postfix/pickup',
+                date: 'Jul 29 16:18:30',
+                qid: '3mfHGL1r9gzyQP',
+                host: 'mx5',
+                uid: 1206,
+                from: 'system',
+            });
+
+            assert.deepEqual(Ship.pfDocs['3mfHGL1r9gzyQP'], {
+                qid: '3mfHGL1r9gzyQP',
+                host: 'mx12',
+                events: [ { date: 'Jul  5 20:21:22', action: 'queued' } ],
+                date: 'Jul  5 20:21:22',
+                isFinal: false,
+                from: 'system',
+                size: 813,
+                nrcpt: 1,
+                uid: 1206
+            },
+            util.inspect(Ship.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
+            done();
+        });
+
+        it('updates the postfix doc with a bounce line', function (done) {
+            Ship.addToPostfixDoc({
+                prog: 'postfix/bounce',
+                date: 'Jul 30 01:14:46',
+                qid: '3mfHGL1r9gzyQP',
+                host: 'mx5',
+                message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+            });
+
+            assert.deepEqual(Ship.pfDocs['3mfHGL1r9gzyQP'], {
+                qid: '3mfHGL1r9gzyQP',
+                host: 'mx12',
+                events: 
+                [ { date: 'Jul  5 20:21:22', action: 'queued' },
+                { date: 'Jul 30 01:14:46',
+                    message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+                action: 'bounced' } ],
+                date: 'Jul  5 20:21:22',
+                isFinal: false,
+                from: 'system',
+                size: 813,
+                nrcpt: 1,
+                uid: 1206
+            },
+            util.inspect(Ship.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
+            done();
+        });
+
+        it('updates the postfix doc with an error line', function (done) {
+            Ship.addToPostfixDoc({
+                qid: '3mfHGL1r9gzyQP',
+                to: 'teehel@tvtanks.com',
+                relay: 'none',
+                delay: '34093',
+                delays: '34093/0.07/0/0.19',
+                dsn: '4.4.1',
+                status: 'deferred (delivery temporarily suspended: connect to mail.tvtanks.com[72.200.300.229]:25: Connection timed out)',
+            });
+
+            assert.deepEqual(Ship.pfDocs['3mfHGL1r9gzyQP'], {
+                qid: '3mfHGL1r9gzyQP',
+                host: 'mx12',
+                events: [
+                    { date: 'Jul  5 20:21:22', action: 'queued' },
+                    { date: 'Jul 30 01:14:46',
+                        message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+                    action: 'bounced' },
+                    { to: 'teehel@tvtanks.com',
+                        relay: 'none',
+                    delay: '34093',
+                    delays: '34093/0.07/0/0.19',
+                    dsn: '4.4.1',
+                    status: 'deferred (delivery temporarily suspended: connect to mail.tvtanks.com[72.200.300.229]:25: Connection timed out)' }
+                ],
+                date: 'Jul  5 20:21:22',
+                isFinal: false,
+                from: 'system',
+                size: 813,
+                nrcpt: 1,
+                uid: 1206
             },
             util.inspect(Ship.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
             done();

@@ -138,10 +138,10 @@ PostfixToElastic.prototype.doQueue = function(done) {
                 console.log('\t\tdocs saved to ES');
                 p2e.doneQueue(null, res);
                 if (!done) return;
-                console.log('giving ES 15s to sync');
+                console.log('giving ES a 5s break');
                 setTimeout(function () {
                     done();
-                }, 15 * 1000);
+                }, 5 * 1000);
             });
         });
     });
