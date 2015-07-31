@@ -96,31 +96,37 @@ Version 0.3 of this project used Logstash in [The Usual Way](https://www.elastic
 
 The next stage was a normalizion script that extracted log data from Elasticsearch, normalized it into the format above, and then saved the normalized documents to another ES index. It was in that normalizion process that we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicates log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is a train wreck.
 
-Instead of a Rube Goldberg pipeline that looks like this:
+Logstash is supposedly robust, and is supposed to apply back-pressure on the pipeline to prevent it from overrunning the parser or the Elasticsearch indexer. In reality, it doesn't (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding in a queue. The 8 separate bugs (all open issues) we ran into convinced us even with a queue, we'd still have issues.
+
+Instead of a Rube Goldberg pipeline like this:
 
 1. Locally generated log files, read by...
 2. Logstash Forwarder, which sends them to...
-3. Logstash, which parses them and sends them to...
-4. Elasticsearch
-
-That is supposedly robust, and is supposed to apply back-pressure on the pipeline to prevent it from overrunning the Logstash parser or the Elasticsearch indexer. In reality, it doesn't, and the suggested solution is making it **more** complicated by adding in a (Rabbit MQ, Redis, or ...?) queue. I'd have been half-tempted to try that, had we not run into 8 separate bugs (open issues) that together, convinced us even with a queue, we'd still have issues.
+3. Message Queue (Redis, Kafka, or RabbitMQ)
+4. Logstash drains the queue, parses logs and sends them to...
+5. Elasticsearch
 
 ## Thoughts
 
-* Why have a separate message queue for logs? They're *already* safely queued on disk. Queueing them again elsewhere is a bizarre (and expensive) "solution" to the "Logstash eats logs" problem.
+* Why have a separate message queue for logs? They're *already* safely queued on disk. Queueing them again is a bizarre (and expensive) "solution" to the "Logstash eats logs" problem.
 * When parsing Postfix logs, where a single message has 4 to N log entries, the tools available for assembling multiple lines into a document using Logstash are insufficient.
 
 ## Instead
 
 1. Locally generated log files, read by...
 2. log-ship-elastic-postfix
-    - parsed by postfix-parser
-    - retrieve matching docs from ES
-    - apply parsed lines against matching / new docs
-    - save to...
+    * parsed by [postfix-parser](https://www.npmjs.com/package/postfix-parser)
+    * retrieve matching docs from ES
+    * apply parsed lines against matching / new docs
+    * save to...
 3. Elasticsearch
 
 If anything goes wrong saving to ES, don't advance our bookmark until a retry works. Check for the existence of documents matches *before* saving, avoiding duplicates in the case of "300 of your 1024 batch were saved" issues.
+
+## Result
+
+Way, way, way faster.
+
 
 
 [ci-img]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix.svg
