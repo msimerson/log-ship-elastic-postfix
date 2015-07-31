@@ -2,7 +2,7 @@ language: node_js
 node_js:
     - "0.10"
     - "0.12"
-    - "iojs"
+    - iojs
 
 os:
     - linux
@@ -11,15 +11,16 @@ os:
 matrix:
     allow_failures:
         - os: osx
+        - node_js: iojs
     fast_finish: true
 
 services:
     - elasticsearch
 
-# wait for elasticsearh to start up
+# wait for elasticsearch to start up
 before_script:
   - chmod -w ./test/spool.nowrite
-  - sleep 10
+  - sleep 12
 
 after_success:
     - npm run coveralls
