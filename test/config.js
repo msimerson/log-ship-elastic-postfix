@@ -8,11 +8,11 @@ var path    = require('path');
 var shipper  = require('../index');
 // var hostName = require('os').hostname();
 
-describe('log-ship-elasticsearch-postfix', function () {
+describe('log-ship-elastic-postfix', function () {
     var Ship = shipper.createShipper('./test');
 
     describe('config', function () {
-        it('finds a log-ship-elasticsearch-postfix.ini', function (done) {
+        it('finds a log-ship-elastic-postfix.ini', function (done) {
             assert.ok(Ship);
             done();
         });

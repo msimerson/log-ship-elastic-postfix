@@ -8,7 +8,7 @@ var shipper  = require('../index');
 /* jshint maxlen: 250 */
 var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<system>, size=813, nrcpt=1 (queue active)';
 
-describe('log-ship-elasticsearch-postfix', function () {
+describe('log-ship-elastic-postfix', function () {
 
     it('configured parser loads', function (done) {
         var Ship = shipper.createShipper('./test');

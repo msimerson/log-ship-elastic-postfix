@@ -1,5 +1,6 @@
 [![Build Status][ci-img]][ci-url]
 [![Coverage Status][cov-img]][cov-url]
+[![Code Climate][clim-img]][clim-url]
 
 # Ship Postfix Logs to Elasticsearch
 
@@ -65,9 +66,9 @@ Into this:
 
 # Install
 
-    npm i log-ship-elasticsearch-postfix
+    npm i log-ship-elastic-postfix
 
-Edit log-ship-elasticsearch-postfix.ini, then launch with:
+Edit log-ship-elastic-postfix.ini, then launch with:
 
     node server.js
 
@@ -78,6 +79,7 @@ Edit log-ship-elasticsearch-postfix.ini, then launch with:
 - [x] official [elasticsearch client](https://www.npmjs.com/package/elasticsearch) load balances among ES hosts
 - [ ] 
 - [x] config file is human friendly ini
+- [x] can replay logs w/o duplicate ES documents
 - [ ] streams multiple files simultaneously
     - [ ] one superviser + one child process per log file (maybe?)
 - [ ] cronolog naming syntax (/var/log/http/YYYY/MM/DD/access.log)
@@ -111,7 +113,7 @@ That is supposedly robust, and is supposed to apply back-pressure on the pipelin
 ## Instead
 
 1. Locally generated log files, read by...
-2. log-ship-elasticsearch-postfix
+2. log-ship-elastic-postfix
     - parsed by postfix-parser
     - retrieve matching docs from ES
     - apply parsed lines against matching / new docs
@@ -121,7 +123,9 @@ That is supposedly robust, and is supposed to apply back-pressure on the pipelin
 If anything goes wrong saving to ES, don't advance our bookmark until a retry works. Check for the existence of documents matches *before* saving, avoiding duplicates in the case of "300 of your 1024 batch were saved" issues.
 
 
-[ci-img]: https://travis-ci.org/DoubleCheck/log-ship-elasticsearch-postfix.svg
-[ci-url]: https://travis-ci.org/DoubleCheck/log-ship-elasticsearch-postfix
-[cov-img]: https://coveralls.io/repos/DoubleCheck/log-ship-elasticsearch-postfix/badge.svg
-[cov-url]: https://coveralls.io/github/DoubleCheck/log-ship-elasticsearch-postfix
+[ci-img]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix.svg
+[ci-url]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix
+[cov-img]: https://coveralls.io/repos/DoubleCheck/log-ship-elastic-postfix/badge.svg
+[cov-url]: https://coveralls.io/github/DoubleCheck/log-ship-elastic-postfix
+[clim-img]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix/badges/gpa.svg
+[clim-url]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix

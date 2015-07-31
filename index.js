@@ -16,26 +16,26 @@ var spool     = require('./lib/spool');
 var postdoc   = require('./lib/postfix-doc');
 
 function PostfixToElastic (etcDir) {
-    this.cfg    = this.loadConfig(etcDir);
-    this.spool  = this.cfg.main.spool || '/var/spool/log-ship';
-    this.batchLimit = this.cfg.elastic.batch || 1024;
+    this.cfg         = this.loadConfig(etcDir);
+    this.spool       = this.cfg.main.spool || '/var/spool/log-ship';
+    this.batchLimit  = this.cfg.elastic.batch || 1024;
 
-    this.queue = [];
-    this.pfDocs = {};
+    this.queue       = [];
+    this.pfDocs      = {};
     this.queueActive = false;
 
     // initialize spool dir
     spool.isValidDir(this.spool);
 
     // initialize the parser
-    this.parser     = require(this.cfg.parser.module);
+    this.parser      = require(this.cfg.parser.module);
     moment.tz.setDefault(this.cfg.parser.timezone || 'America/Phoenix');
     this.parser.moment = moment;
 
     // initialize Elasticsearch
-    var esm      = require(this.cfg.elastic.module);
-    this.eshosts = this.cfg.elastic.hosts.split(/[, ]+/);
-    this.elastic = new esm.Client({
+    var esm          = require(this.cfg.elastic.module);
+    this.eshosts     = this.cfg.elastic.hosts.split(/[, ]+/);
+    this.elastic     = new esm.Client({
         hosts: this.eshosts,
         // log: 'trace',
     });
@@ -57,7 +57,7 @@ function PostfixToElastic (etcDir) {
         })
         .on('readable', function () {
             // 'this' is a reader instance
-            this.read();
+            this.readLine();
         })
         .on('read', p2e.readLogLine.bind(p2e))
         .on('end', function (done) {
@@ -237,7 +237,7 @@ PostfixToElastic.prototype.saveResultsToEs = function(done) {
 };
 
 PostfixToElastic.prototype.loadConfig = function(etcDir) {
-    var file = 'log-ship-elasticsearch-postfix.ini';
+    var file = 'log-ship-elastic-postfix.ini';
     var candidates = [];
     if (etcDir) candidates.push(path.resolve(etcDir, file));
     if (etcDir !== '/etc') {

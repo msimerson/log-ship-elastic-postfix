@@ -9,7 +9,7 @@ var shipper  = require('../index');
 var spool    = require('../lib/spool');
 var hostName = require('os').hostname();
 
-describe('log-ship-elasticsearch-postfix', function () {
+describe('log-ship-elastic-postfix', function () {
     var Ship = shipper.createShipper('./test');
 
     describe('spool', function () {

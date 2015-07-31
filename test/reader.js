@@ -6,7 +6,7 @@ var shipper  = require('../index');
 var Ship     = shipper.createShipper('./test');
 var hostName = require('os').hostname();
 
-describe('log-ship-elasticsearch-postfix', function () {
+describe('log-ship-elastic-postfix', function () {
 
     describe('reader', function () {
 

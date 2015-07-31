@@ -1,15 +1,15 @@
 {
-  "name": "log-ship-elasticsearch-postfix",
+  "name": "log-ship-elastic-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
   "version": "0.6.0",
   "private": false,
-  "homepage": "https://github.com/DoubleCheck/log-ship-elasticsearch-postfix",
+  "homepage": "https://github.com/DoubleCheck/log-ship-elastic-postfix",
   "bugs": {
-    "url": "https://github.com/DoubleCheck/log-ship-elasticsearch-postfix/issues"
+    "url": "https://github.com/DoubleCheck/log-ship-elastics-postfix/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/DoubleCheck/log-ship-elasticsearch-postfix.git"
+    "url": "git://github.com/DoubleCheck/log-ship-elastic-postfix.git"
   },
   "dependencies": {
     "async": "^1.3.0",
