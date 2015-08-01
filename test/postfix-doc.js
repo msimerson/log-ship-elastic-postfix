@@ -11,6 +11,11 @@ var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<
 
 describe('postfix-doc', function () {
 
+    it('configured parser loads', function (done) {
+        assert.ok(postdoc.parser);
+        done();
+    });
+
     describe('addEvent', function () {
         var shipper = logship.createShipper('./test');
 

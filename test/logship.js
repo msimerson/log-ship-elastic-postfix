@@ -10,12 +10,6 @@ var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<
 
 describe('log-ship-elastic-postfix', function () {
 
-    it('configured parser loads', function (done) {
-        var shipper = logship.createShipper('./test');
-        assert.ok(shipper.parser);
-        done();
-    });
-
     describe('readLogLine', function () {
         var shipper     = logship.createShipper('./test');
 

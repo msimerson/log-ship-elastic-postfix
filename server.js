@@ -11,10 +11,6 @@ var shutdown = function () {
 
     process.env.WANTS_SHUTDOWN=1;
 
-    if (shipper.reader && shipper.reader.liner) {
-        shipper.reader.liner.close();
-    }
-
     if (!shipper.elasticAlive) process.exit();
     if (!shipper.queueActive) process.exit();
 
