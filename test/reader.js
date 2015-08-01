@@ -1,9 +1,9 @@
 'use strict';
-
+/* jshint maxlen: 100 */
 var assert   = require('assert');
 
-var shipper  = require('../index');
-var Ship     = shipper.createShipper('./test');
+var logship  = require('../lib/logship');
+var shipper  = logship.createShipper('./test');
 var hostName = require('os').hostname();
 
 describe('log-ship-elastic-postfix', function () {
@@ -14,16 +14,16 @@ describe('log-ship-elastic-postfix', function () {
         if (/(?:travis|worker|dev-test)/.test(hostName)) {
 
             it('should load', function (done) {
-                assert.ok(Ship.reader);
+                assert.ok(shipper.reader);
                 done();
             });
 
-            if (Ship.reader) {
+            if (shipper.reader) {
                 it('is readable', function (done) {
-                    assert.ok(Ship.reader.liner &&
-                        (Ship.reader.liner.readable || Ship.queue.length));
-                    // console.log(Ship.reader.liner.readable);
-                    // console.log(Ship.queue);
+                    assert.ok(shipper.reader.liner &&
+                        (shipper.reader.liner.readable || shipper.queue.length));
+                    // console.log(shipper.reader.liner.readable);
+                    // console.log(shipper.queue);
                     done();
                 });
 

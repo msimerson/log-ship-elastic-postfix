@@ -1,10 +1,10 @@
 'use strict';
 
-var assert = require('assert');
+var assert   = require('assert');
 var util     = require('util');
 
-var shipper = require('../index');
-var postdoc = require('../lib/postfix-doc');
+var logship  = require('../lib/logship');
+var postdoc  = require('../lib/postfix-doc');
 
 /* jshint maxlen: 250 */
 var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<system>, size=813, nrcpt=1 (queue active)';
@@ -12,32 +12,32 @@ var testLine = 'Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: from=<
 describe('postfix-doc', function () {
 
     describe('addEvent', function () {
-        var Ship = shipper.createShipper('./test');
+        var shipper = logship.createShipper('./test');
 
         before(function (done) {
-            Ship.readLogLine(testLine, 1);
-            Ship.updatePfDocs(function () {
-                // console.log(Ship.pfDocs);
+            shipper.readLogLine(testLine, 1);
+            shipper.updatePfDocs(function () {
+                // console.log(shipper.pfDocs);
                 done();
             });
         });
 
         it('appends an event to a doc', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.addEvent(doc, { qid: '3mfHGL1r9gzyQP', action: 'removed' });
             assert.equal(doc.events.length, 2, util.inspect(doc, {depth: null}));
             done();
         });
 
         it('does not append duplicate event', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.addEvent(doc, { qid: '3mfHGL1r9gzyQP', action: 'removed' });
             assert.equal(doc.events.length, 2, util.inspect(doc, {depth: null}));
             done();
         });
 
         it('does not append subsequent queue events', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.addEvent(doc, {
                 qid: '3mfHGL1r9gzyQP',
                 action: 'queued',
@@ -51,16 +51,16 @@ describe('postfix-doc', function () {
     describe('update', function () {
         // Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP:
         //      from=<system>, size=813, nrcpt=1 (queue active)
-        var Ship = shipper.createShipper('./test');
+        var shipper = logship.createShipper('./test');
         it('updates a postfix doc with a qmgr line ', function (done) {
-            Ship.pfDocs['3mfHGL1r9gzyQP'] = {
+            shipper.pfDocs['3mfHGL1r9gzyQP'] = {
                 qid:     '3mfHGL1r9gzyQP',
                 host:    'mx12',
                 events:  [],
                 date:    'Jul  5 20:21:22',
                 isFinal: false,
             };
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.update(doc, {
                 'prog': 'postfix/qmgr',
                 'date': 'Jul  5 20:21:22',
@@ -70,7 +70,7 @@ describe('postfix-doc', function () {
                 'size': 813,
                 'nrcpt': 1,
             });
-            assert.deepEqual(Ship.pfDocs['3mfHGL1r9gzyQP'], {
+            assert.deepEqual(shipper.pfDocs['3mfHGL1r9gzyQP'], {
                 qid: '3mfHGL1r9gzyQP',
                 host: 'mx12',
                 events: [ { date: 'Jul  5 20:21:22', action: 'queued' } ],
@@ -80,12 +80,12 @@ describe('postfix-doc', function () {
                 size: 813,
                 nrcpt: 1,
             },
-            util.inspect(Ship.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
+            util.inspect(shipper.pfDocs['3mfHGL1r9gzyQP'], {depth: null}));
             done();
         });
 
         it('updates the postfix doc with a pickup line', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.update(doc, {
                 prog: 'postfix/pickup',
                 date: 'Jul 29 16:18:30',
@@ -111,7 +111,7 @@ describe('postfix-doc', function () {
         });
 
         it('updates the postfix doc with a bounce line', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.update(doc, {
                 prog: 'postfix/bounce',
                 date: 'Jul 30 01:14:46',
@@ -141,7 +141,7 @@ describe('postfix-doc', function () {
         });
 
         it('updates the postfix doc with an error line', function (done) {
-            var doc = Ship.pfDocs['3mfHGL1r9gzyQP'];
+            var doc = shipper.pfDocs['3mfHGL1r9gzyQP'];
             postdoc.update(doc, {
                 qid: '3mfHGL1r9gzyQP',
                 to: 'teehel@tvtanks.com',

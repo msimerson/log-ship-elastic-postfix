@@ -1,32 +1,32 @@
 'use strict';
 /* jshint maxlen: 100 */
 
-var assert  = require('assert');
-var fs      = require('fs');
-var path    = require('path');
+var assert   = require('assert');
+var fs       = require('fs');
+var path     = require('path');
 
-var shipper  = require('../index');
+var logship  = require('../lib/logship');
 var spool    = require('../lib/spool');
 var hostName = require('os').hostname();
 
 describe('log-ship-elastic-postfix', function () {
-    var Ship = shipper.createShipper('./test');
+    var shipper = logship.createShipper('./test');
 
     describe('spool', function () {
         it('spool dir is defined', function (done) {
-            assert.ok(Ship.cfg.main.spool);
+            assert.ok(shipper.cfg.main.spool);
             done();
         });
 
         it('spool dir is writable', function (done) {
-            spool.isWritable(Ship.cfg.main.spool, function (err) {
+            spool.isWritable(shipper.cfg.main.spool, function (err) {
                 assert.ifError(err);
                 done();
             });
         });
 
         it('errs if spool dir is not writable', function (done) {
-            var errShip = shipper.createShipper('./test');
+            var errShip = logship.createShipper('./test');
             var spoolDir = path.resolve('./test', 'spool.nowrite');
             // console.log(errShip);
             spool.isValidDir(spoolDir, function (err) {

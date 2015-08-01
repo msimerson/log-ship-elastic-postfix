@@ -4,8 +4,8 @@ var assert   = require('assert');
 var fs       = require('fs');
 var path     = require('path');
 
-var shipper  = require('../index');
-var Ship     = shipper.createShipper('./test');
+var logship  = require('../lib/logship');
+var shipper  = logship.createShipper('./test');
 var hostName = require('os').hostname();
 
 describe('log-ship-elastic-postfix', function () {
@@ -13,7 +13,7 @@ describe('log-ship-elastic-postfix', function () {
     describe('elasticsearch', function () {
 
         it('loads the specified elasticsearch module', function (done) {
-            assert.ok(Ship.elastic);
+            assert.ok(shipper.elastic);
             done();
         });
 
@@ -30,14 +30,14 @@ describe('log-ship-elastic-postfix', function () {
                     indexMap = JSON.parse(data);
                     // console.log(indexMap);
 
-                    Ship.elastic.indices.delete({index: indexMap.template},
+                    shipper.elastic.indices.delete({index: indexMap.template},
                     function (err) {
                         // if (err) console.error(err); // may not exist
-                        Ship.elastic.indices.create({index: indexMap.template },
+                        shipper.elastic.indices.create({index: indexMap.template },
                         function (err, res) {
                             // if (err) console.error(err); // may already exist
 
-                            Ship.elastic.indices.putMapping({
+                            shipper.elastic.indices.putMapping({
                                 index: indexMap.template,
                                 type: indexMap.template,
                                 body: indexMap.mappings,
@@ -55,7 +55,7 @@ describe('log-ship-elastic-postfix', function () {
 
             it('connects to configured ES host', function (done) {
 
-                Ship.elastic.ping({
+                shipper.elastic.ping({
                     // ping usually has a 3000ms timeout
                     // requestTimeout: Infinity,
                 }, function (error) {
