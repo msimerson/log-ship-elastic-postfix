@@ -15,10 +15,11 @@ describe('postfix-doc', function () {
         var shipper = logship.createShipper('./test');
 
         before(function (done) {
-            shipper.readLogLine(testLine, 1);
-            shipper.updatePfDocs(function () {
-                // console.log(shipper.pfDocs);
-                done();
+            shipper.readLogLine(testLine, 1, function () {
+                shipper.updatePfDocs(function () {
+                    // console.log(shipper.pfDocs);
+                    done();
+                });                
             });
         });
 
