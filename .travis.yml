@@ -19,10 +19,11 @@ services:
 
 # wait for elasticsearch to start up
 before_script:
-  - chmod -w ./test/spool.nowrite
+  - chmod -w ./test/spool/nowrite
   - sleep 12
 
 after_success:
+    - npm run coverage
     - npm run coveralls
 
 sudo: false

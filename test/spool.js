@@ -27,7 +27,7 @@ describe('log-ship-elastic-postfix', function () {
 
         it('errs if spool dir is not writable', function (done) {
             var errShip = logship.createShipper('./test');
-            var spoolDir = path.resolve('./test', 'spool.nowrite');
+            var spoolDir = path.resolve('./test', 'spool','nowrite');
             // console.log(errShip);
             spool.isValidDir(spoolDir, function (err) {
                 assert.equal(err.code, 'EACCES');
@@ -44,7 +44,7 @@ describe('log-ship-elastic-postfix', function () {
         });
 
         it('isDirectory reports false for file', function (done) {
-            var spoolFile = path.resolve('./test', 'spool.file');
+            var spoolFile = path.resolve('./test', 'spool','file');
             assert.equal(spool.isDirectory(spoolFile), false);
             done();
         });
@@ -56,7 +56,7 @@ describe('log-ship-elastic-postfix', function () {
         });
 
         it('isWritable reports false for non-writable dir', function (done) {
-            var spoolDir = path.resolve('./test', 'spool.nowrite');
+            var spoolDir = path.resolve('./test', 'spool', 'nowrite');
             assert.equal(spool.isWritable(spoolDir), false);
             done();
         });
@@ -68,7 +68,7 @@ describe('log-ship-elastic-postfix', function () {
         });
 
         it('isWritablePreV12 reports false for non-writable dir', function (done) {
-            var spoolDir = path.resolve('./test', 'spool.nowrite');
+            var spoolDir = path.resolve('./test', 'spool', 'nowrite');
             assert.equal(spool.isWritablePreV12(spoolDir), false);
             done();
         });

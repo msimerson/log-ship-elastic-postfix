@@ -47,7 +47,7 @@ describe('log-ship-elastic-postfix', function () {
                                 // other tests are running, so currently
                                 // stored mapping may conflict
                                 done();
-                            });                        
+                            });
                         });
                     });
                 });
