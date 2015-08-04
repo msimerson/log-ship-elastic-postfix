@@ -57,11 +57,11 @@ Into this:
 
 # How it Works
 
-- read a batches of log entries
-- parse each with [postfix-parser](https://github.com/DoubleCheck/postfix-parser)
+- read a batch of log entries
+- parse each line with [postfix-parser](https://github.com/DoubleCheck/postfix-parser)
 - fetch matching docs from Elasticsearch
 - update/create normalized docs
-- saves new/updated docs to Elasticsearch
+- save new/updated docs to Elasticsearch
 
 
 # Install
@@ -77,28 +77,24 @@ Edit log-ship-elastic-postfix.ini, then launch with:
 
 - [x] drop in modules for: reader, parser, and elasticsearch
 - [x] official [elasticsearch client](https://www.npmjs.com/package/elasticsearch) load balances among ES hosts
-- [ ] 
 - [x] config file is human friendly ini
 - [x] can replay logs w/o duplicate ES documents
 - [ ] streams multiple files simultaneously
-    - [ ] one superviser + one child process per log file (maybe?)
 - [ ] cronolog naming syntax (/var/log/http/YYYY/MM/DD/access.log)
     - [ ] watches existing directory ancestor
 - [ ] winston naming syntax (app.log1, app.log2, etc.)
-- [ ] process line status, `ps` output examples:
-    - reader:/var/log/mail.log   lines:43023 reading
-    - reader:/var/log/mail.log.1 lines:98302 waiting for data
+- [ ] email alerts for unrecoverable errors
 
 
 # But, Logstash?!
 
 Version 0.3 of this project used Logstash in [The Usual Way](https://www.elastic.co/guide/en/logstash/current/deploying-and-scaling.html), to ship logs to Elasticsearch and do basic line parsing.
 
-The next stage was a normalizion script that extracted log data from Elasticsearch, normalized it into the format above, and then saved the normalized documents to another ES index. It was in that normalizion process that we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicates log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is a train wreck.
+The next stage was a normalizion script that extracted log data from Elasticsearch, normalized it into the format above, and then saved the normalized documents to another ES index. It was in that normalizion process that we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicates log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is ... less reliable than we hoped.
 
-Logstash is supposedly robust, and is supposed to apply back-pressure on the pipeline to prevent it from overrunning the parser or the Elasticsearch indexer. In reality, it doesn't (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding in a queue. The 8 separate bugs (all open issues) we ran into convinced us even with a queue, we'd still have issues.
+Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it doesn't (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we'd still have issues.
 
-Instead of a Rube Goldberg pipeline like this:
+Instead of a pipline Rube Goldberg would be happy with:
 
 1. Locally generated log files, read by...
 2. Logstash Forwarder, which sends them to...
@@ -106,26 +102,30 @@ Instead of a Rube Goldberg pipeline like this:
 4. Logstash drains the queue, parses logs and sends them to...
 5. Elasticsearch
 
+...we decided a simpler solution would be better.
+
 ## Thoughts
 
-* Why have a separate message queue for logs? They're *already* safely queued on disk. Queueing them again is a bizarre (and expensive) "solution" to the "Logstash eats logs" problem.
-* When parsing Postfix logs, where a single message has 4 to N log entries, the tools available for assembling multiple lines into a document using Logstash are insufficient.
+* Logs are *already* safely queued on disk. Queueing them again is a bizarre (and expensive) "solution" to the "Logstash eats logs" problem.
+* When parsing Postfix logs, where a single message has 4 to N log entries, the tools available for assembling multiple lines into a document using Logstash are insufficient, leaving post-processing and normalization to other external processes.
 
 ## Instead
 
 1. Locally generated log files, read by...
 2. log-ship-elastic-postfix
     * parsed by [postfix-parser](https://www.npmjs.com/package/postfix-parser)
-    * retrieve matching docs from ES
-    * apply parsed lines against matching / new docs
+    * retrieves matching docs from ES
+    * apply updated log entries against matching / new docs
     * save to...
 3. Elasticsearch
 
-If anything goes wrong saving to ES, don't advance our bookmark until a retry works. Check for the existence of documents matches *before* saving, avoiding duplicates in the case of "300 of your 1024 batch were saved" issues.
+If anything goes wrong saving to ES, don't advance the bookmark until a retry works. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
 
-## Result
+## Results
 
-Way, way, way faster.
+* Way, way, way faster.
+* Uses far less storage in ES
+* Far less ES traffic
 
 
 
