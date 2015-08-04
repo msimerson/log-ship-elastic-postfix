@@ -1,8 +1,11 @@
 {
   "name": "log-ship-elastic-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": false,
+  "keywords": [
+    "log", "postfix", "elasticsearch", "log ship"
+  ],
   "homepage": "https://github.com/DoubleCheck/log-ship-elastic-postfix",
   "bugs": {
     "url": "https://github.com/DoubleCheck/log-ship-elastic-postfix/issues"
