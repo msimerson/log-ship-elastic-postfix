@@ -12,6 +12,13 @@ var hostName = require('os').hostname();
 describe('log-ship-elastic-postfix', function () {
     var shipper = logship.createShipper('./test');
 
+    before(function (done) {
+        fs.chmod(path.resolve('test','spool','nowrite'), '0444', function (err) {
+            if (err) console.error(err);
+            done();
+        });
+    });
+
     describe('spool', function () {
         it('spool dir is defined', function (done) {
             assert.ok(shipper.cfg.main.spool);

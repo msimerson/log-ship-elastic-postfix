@@ -128,6 +128,8 @@ If anything goes wrong saving to ES, don't advance the bookmark until a retry wo
 * Far less ES traffic
 
 
+<sub>Copyright 2015 by eFolder, Inc.</sub>
+
 
 [ci-img]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix.svg
 [ci-url]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix

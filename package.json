@@ -43,6 +43,7 @@
       "threshold": 80
     }
   },
+  "license" : "BSD-2-Clause",
   "scripts": {
     "start": "node server.js",
     "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --require blanket --reporter travis-cov",
