@@ -1,7 +1,7 @@
 {
   "name": "log-ship-elastic-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": false,
   "keywords": [
     "log", "postfix", "elasticsearch", "log ship"
@@ -24,6 +24,10 @@
   "devDependencies": {
     "blanket": "^1.1.7",
     "coveralls": "^2.11.2",
+    "grunt": "^0.4.5",
+    "grunt-eslint": "^17.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "grunt-version-check": "^0.2.1",
     "mocha": "^2.2.5",
     "mocha-lcov-reporter": "0.0.2",
     "travis-cov": "^0.2.5"
@@ -45,9 +49,9 @@
   },
   "license" : "BSD-2-Clause",
   "scripts": {
-    "start": "node server.js",
     "coverage": "NODE_ENV=test COVERAGE=1 ./node_modules/.bin/mocha --require blanket --reporter travis-cov",
     "coveralls": "COVERAGE=1 ./node_modules/.bin/mocha --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js",
+    "start": "node server.js",
     "test": "NODE_ENV=test mocha"
   }
 }

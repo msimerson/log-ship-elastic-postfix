@@ -1,0 +1,6 @@
+Gruntfile.js
+.gitignore
+.jshintrc
+.eslintrc
+.travis.yml
+appveyor.yml
