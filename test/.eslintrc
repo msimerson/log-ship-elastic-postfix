@@ -1,0 +1,10 @@
+{
+ "rules": {
+    "max-len": [2, 200, 4, {
+        ignoreComments: true, 
+        ignoreUrls: true, 
+        ignorePattern: "\\/"
+      }
+    ],
+  }
+}
