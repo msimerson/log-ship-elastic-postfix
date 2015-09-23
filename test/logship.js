@@ -3,7 +3,7 @@
 var assert   = require('assert');
 var util     = require('util');
 
-var moment    = require('moment-timezone');
+var moment   = require('moment-timezone');
 
 var logship  = require('../lib/logship');
 
