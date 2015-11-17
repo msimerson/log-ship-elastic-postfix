@@ -131,7 +131,8 @@ describe('postfix-doc', function () {
             { date: 'Jul  5 20:21:22', action: 'queued' },
             { date: 'Jul 30 01:14:46',
               message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
-              action: 'bounced' }
+              action: 'bounced'
+            }
         ],
         date: 'Jul  5 20:21:22',
         isFinal: false,
@@ -179,6 +180,43 @@ describe('postfix-doc', function () {
         uid: 1206
       },
       util.inspect(doc, { depth: null }));
+      done();
+    });
+
+    it('updates a postfix doc with postsuper lines', function (done) {
+      shipper.pfDocs['3nsRhm5bH5z306M'] = {
+        qid:     '3nsRhm5bH5z306M',
+        host:    'mailq2',
+        events:  [],
+        date:    'Nov  6 01:01:03',
+        isFinal: false,
+      };
+      var doc = shipper.pfDocs['3nsRhm5bH5z306M'];
+      postdoc.update(doc, {
+        date: 'Nov  6 01:01:03',
+        host: 'mailq2',
+        prog: 'postfix/postsuper',
+        msg: 'released from hold',
+        qid: '3nsRhm5bH5z306M',
+      });
+      postdoc.update(doc, {
+        date: 'Nov  6 01:01:04',
+        host: 'mailq2',
+        prog: 'postfix/postsuper',
+        msg: 'removed',
+        qid: '3nsRhm5bH5z306M',
+      });
+      assert.deepEqual(doc, {
+        qid: '3nsRhm5bH5z306M',
+        host: 'mailq2',
+        events: [
+          { date: 'Nov  6 01:01:03', action: 'released from hold' },
+          { date: 'Nov  6 01:01:04', action: 'removed' }
+        ],
+        date: 'Nov  6 01:01:03',
+        isFinal: true
+      },
+      util.inspect(shipper.pfDocs['3nsRhm5bH5z306M'], { depth: null }));
       done();
     });
   });

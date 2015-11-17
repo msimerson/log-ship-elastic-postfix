@@ -1,6 +1,7 @@
 [![Build Status][ci-img]][ci-url]
 [![Code Coverage][cov-img]][cov-url]
 [![Code Climate][clim-img]][clim-url]
+[![NPM][npm-img]][npm-url]
 
 # Ship Postfix Logs to Elasticsearch
 
@@ -129,3 +130,5 @@ When saving to ES fails, retry, and don't advance the bookmark until a retry suc
 [cov-url]: https://codecov.io/github/DoubleCheck/log-ship-elastic-postfix
 [clim-img]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix/badges/gpa.svg
 [clim-url]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix
+[npm-img]: https://nodei.co/npm/log-ship-elastic-postfix.png
+[npm-url]: https://www.npmjs.com/package/log-ship-elastic-postfix
