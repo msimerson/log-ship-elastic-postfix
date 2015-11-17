@@ -1,0 +1,19 @@
+{
+  "host": "dc-prd-mailq1",
+  "events": [
+    {
+      "date": "2015-11-16T15:33:45-07:00",
+      "action": "queued"
+    },
+    {
+      "date": "2015-11-16T15:33:46-07:00",
+      "action": "removed"
+    }
+  ],
+  "date": "2015-11-16T15:33:44-07:00",
+  "isFinal": true,
+  "message-id": "1511499541.586605881447713205707.JavaMail.app@rbg.atlis1",
+  "from": "v-mfpbbg_bnbijgahf_chghngdd_chghngdd_a@bounce.anesrp.example.com",
+  "size": "15863",
+  "nrcpt": "1"
+}

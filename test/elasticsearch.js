@@ -20,6 +20,20 @@ describe('log-ship-elastic-postfix', function () {
     if (/(?:travis|worker|dev-test)/.test(hostName)) {
       // gotta have ES available to test these...
 
+      before(function (done) {
+        var pfDoc = path.resolve('test', 'fixtures', 'postfix.json');
+        fs.readFile(pfDoc, function (err, data) {
+          if (err) return done(err);
+          shipper.elastic.update({
+            index: 'postfix-2015-11-16',
+            type: 'postfix',
+            id: '3p04tw2SxSz4w6c',
+            body: pfDoc,
+          });
+          done();
+        });
+      });
+
       this.timeout(4000);
       it('can store an index map template', function (done) {
         var filePath = path.resolve('index-map-template.json');
