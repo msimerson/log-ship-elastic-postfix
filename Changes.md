@@ -1,4 +1,8 @@
 
+# 0.9.6 - 2015-11-18
+
+    - honor the batchDelay setting
+
 # 0.9.5 - 2015-11-16
 
     - add support for postfix/postsuper entries
