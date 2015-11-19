@@ -1,7 +1,7 @@
 {
   "name": "log-ship-elastic-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "private": false,
   "keywords": [
     "log", "postfix", "elasticsearch", "log ship"
