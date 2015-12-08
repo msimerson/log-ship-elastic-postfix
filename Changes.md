@@ -1,4 +1,15 @@
 
+# 0.9.7 - 2015-12-09
+
+    - improved config file selection and loading
+    - save to parent index (if defined and available)
+    - moved startReader() into new function
+    - when searching for doc matches, limit to time series indexes covering the date of the postfix docs read.
+    - WARNING: due to above, config file options have changed. You **MUST** update your config file!
+        - `indices` option removed
+        - `timeformat` added.
+        - index names are automatically appended with `timeformat` suffix
+
 # 0.9.6 - 2015-11-18
 
     - honor the batchDelay setting

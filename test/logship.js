@@ -78,35 +78,4 @@ describe('log-ship-elastic-postfix', function () {
       });
     });
   });
-
-  describe('getIndexName', function () {
-
-    // date is a moment.js object: http://momentjs.com/docs/#/get-set/get/
-    var date = moment('Jul 26 04:18:34', 'MMM DD HH:mm:ss');
-    var y = date.format('YYYY');
-    var m = date.format('MM');
-    var d = date.format('DD');
-
-    it('returns a static index name', function () {
-      shipper.cfg.elastic.index='postfix-orphan';
-      assert.equal(shipper.getIndexName(date), 'postfix-orphan');
-    });
-
-    it('date template year', function () {
-      shipper.cfg.elastic.index='postfix-orphan-YYYY';
-      assert.equal(shipper.getIndexName(date), 'postfix-orphan-' + y);
-    });
-
-    it('date template month', function () {
-      shipper.cfg.elastic.index='postfix-orphan-YYYY-MM';
-      assert.equal(shipper.getIndexName(date), 'postfix-orphan-' + y + '-' + m);
-    });
-
-    it('date template day', function () {
-      shipper.cfg.elastic.index='postfix-orphan-YYYY-MM-DD';
-      assert.equal(
-        shipper.getIndexName(date),
-        'postfix-orphan-' + y + '-' + m + '-' + d);
-    });
-  });
 });
