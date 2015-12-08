@@ -73,6 +73,10 @@ Edit log-ship-elastic-postfix.ini, then launch with:
 
     node server.js
 
+With a custom config directory:
+
+    node server.js -config ~/etc/
+
 
 # Features
 
