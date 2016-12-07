@@ -3,8 +3,6 @@
 var assert   = require('assert');
 var util     = require('util');
 
-var moment   = require('moment-timezone');
-
 var logship  = require('../lib/logship');
 
 /* jshint maxlen: 250 */
@@ -19,13 +17,14 @@ describe('log-ship-elastic-postfix', function () {
       shipper.queue = [];
       shipper.readLogLine(testLine, 1);
       assert.deepEqual(shipper.queue[0],
-        {   qid: '3mfHGL1r9gzyQP',
+        {
+          qid: '3mfHGL1r9gzyQP',
           from: 'system',
-        size: '813',
-        nrcpt: '1',
-        host: 'mx12',
-        prog: 'postfix/qmgr',
-        date: '2015-07-26T04:18:34-07:00'
+          size: '813',
+          nrcpt: '1',
+          host: 'mx12',
+          prog: 'postfix/qmgr',
+          date: '2016-07-26T04:18:34-07:00'
         },
         util.inspect(shipper.queue[0], { depth: null })
         );
@@ -54,23 +53,26 @@ describe('log-ship-elastic-postfix', function () {
       shipper.readLogLine('Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: removed', 3);
       shipper.updatePfDocs(function () {
         assert.deepEqual(shipper.pfDocs['3mfHGL1r9gzyQP'],
-          {   qid: '3mfHGL1r9gzyQP',
+          {
+            qid: '3mfHGL1r9gzyQP',
             host: 'mx12',
-          events:
-          [ { date: '2015-07-26T04:18:34-07:00', action: 'queued' },
-          { to: 'system',
-            relay: '127.0.0.2[127.0.0.2]:25',
-          dsn: '2.0.0',
-          status: 'sent (250 Queued! (#2.0.0))',
-          date: '2015-07-26T04:18:34-07:00' },
-          { date: '2015-07-26T04:18:34-07:00', action: 'removed' } ],
-          date: '2015-07-26T04:18:34-07:00',
-          isFinal: true,
-          from: 'system',
-          size: '813',
-          nrcpt: '1',
-          delay: '0.53',
-          delays: '0.13/0/0.23/0.16'
+            events: [
+              { date: '2016-07-26T04:18:34-07:00', action: 'queued' },
+              {
+                to: 'system',
+                relay: '127.0.0.2[127.0.0.2]:25',
+                dsn: '2.0.0',
+                status: 'sent (250 Queued! (#2.0.0))',
+                date: '2016-07-26T04:18:34-07:00' },
+              { date: '2016-07-26T04:18:34-07:00', action: 'removed' }
+            ],
+            date: '2016-07-26T04:18:34-07:00',
+            isFinal: true,
+            from: 'system',
+            size: '813',
+            nrcpt: '1',
+            delay: '0.53',
+            delays: '0.13/0/0.23/0.16'
           },
           util.inspect(shipper.pfDocs['3mfHGL1r9gzyQP'], { depth: null })
           );
