@@ -28,10 +28,11 @@ module.exports = function(grunt) {
       modules: ['node_modules'],
       build:   ['npm-debug.log'],
       editor:  ['./**/*~', './**/*.swp'],
-      dist:    ['<%= clean.editor %>',
-                '<%= clean.modules %>',
-                '<%= clean.build %>',
-                ],
+      dist:    [
+        '<%= clean.editor %>',
+        '<%= clean.modules %>',
+        '<%= clean.build %>',
+      ],
     },
     versioncheck: {
       options: {

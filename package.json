@@ -32,21 +32,6 @@
     "grunt-version-check": "*",
     "mocha": "*"
   },
-  "config": {
-    "blanket": {
-      "pattern": [
-        "server.js",
-        "lib"
-      ],
-      "data-cover-never": [
-        "node_modules",
-        "test"
-      ]
-    },
-    "travis-cov": {
-      "threshold": 80
-    }
-  },
   "license": "BSD-2-Clause",
   "scripts": {
     "start": "node server.js",

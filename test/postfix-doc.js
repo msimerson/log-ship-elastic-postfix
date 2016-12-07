@@ -128,11 +128,12 @@ describe('postfix-doc', function () {
         qid: '3mfHGL1r9gzyQP',
         host: 'mx12',
         events: [
-            { date: 'Jul  5 20:21:22', action: 'queued' },
-            { date: 'Jul 30 01:14:46',
-              message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
-              action: 'bounced'
-            }
+          { date: 'Jul  5 20:21:22', action: 'queued' },
+          {
+            date: 'Jul 30 01:14:46',
+            message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+            action: 'bounced'
+          }
         ],
         date: 'Jul  5 20:21:22',
         isFinal: false,
@@ -163,14 +164,17 @@ describe('postfix-doc', function () {
         events: [
           { date: 'Jul  5 20:21:22', action: 'queued' },
           { date: 'Jul 30 01:14:46',
-              message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
-          action: 'bounced' },
-          { to: 'teehel@tvtanks.com',
-              relay: 'none',
-          delay: '34093',
-          delays: '34093/0.07/0/0.19',
-          dsn: '4.4.1',
-          status: 'deferred (delivery temporarily suspended: connect to mail.tvtanks.com[72.200.300.229]:25: Connection timed out)' }
+            message: 'sender non-delivery notification: 3mhjft5mzQzyNY',
+            action: 'bounced'
+          },
+          {
+            to: 'teehel@tvtanks.com',
+            relay: 'none',
+            delay: '34093',
+            delays: '34093/0.07/0/0.19',
+            dsn: '4.4.1',
+            status: 'deferred (delivery temporarily suspended: connect to mail.tvtanks.com[72.200.300.229]:25: Connection timed out)'
+          }
         ],
         date: 'Jul  5 20:21:22',
         isFinal: false,
