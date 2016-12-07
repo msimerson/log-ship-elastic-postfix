@@ -6,13 +6,13 @@
     "brace-style": [2, "stroustrup", { "allowSingleLine": true }],
     "consistent-return": 0,
     "curly": [1, "multi-line"],
-    dot-notation: 2,
+    "dot-notation": 2,
     "eqeqeq": 2,
     "indent": [2, 2, {"SwitchCase": 1}],
     "max-len": [2, 80, 4, {
-        ignoreComments: true, 
-        ignoreUrls: true, 
-        ignorePattern: "\\/"
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignorePattern": "\\/"
       }
     ],
     "no-multiple-empty-lines": 2,
@@ -31,10 +31,10 @@
     "no-extra-semi": 2,
     "semi-spacing": 2,
     "keyword-spacing": [2, {
-        "overrides": { },
-        "before": true,
-        "after": true
-        }],
+      "overrides": { },
+      "before": true,
+      "after": true
+    }],
     "space-in-parens": [2, "never"],
     "space-unary-ops": [2, {
       "words": true,
