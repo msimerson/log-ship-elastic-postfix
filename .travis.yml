@@ -13,7 +13,15 @@ matrix:
 #       - node_js: iojs
     fast_finish: true
 
+addons:
+  apt:
+    sources:
+      - elasticsearch-2.x
+    packages:
+      elasticsearch
+
 services:
+    - redis-server
     - elasticsearch
 
 # wait for elasticsearch to start up
