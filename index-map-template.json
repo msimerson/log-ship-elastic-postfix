@@ -3,7 +3,7 @@
     "mappings" : {
         "postfix-orphan" : {
             "properties": {
-                "id":     { "type" : "string", "index": "not_analyzed", "store" : true },
+                "_id":     { "type" : "string", "index": "not_analyzed", "store" : true },
                 "date" :   { "type" : "date" },
                 "delay" :  { "type" : "float" },
                 "events" : {

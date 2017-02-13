@@ -24,7 +24,7 @@ Into this:
 
 ````json
 {
-    "qid": "3mfHGL1r9gzyQP",
+    "id": "3mfHGL1r9gzyQP",
     "host": "mx12",
     "events": [
       {
@@ -78,12 +78,6 @@ With a custom config directory:
     node server.js -config ~/etc/
 
 
-# Versions
-
-- For Elastic v5, use at least version 1.0.0 of this module.
-- Versions of log-ship-elastic-postfix < 1.0.0 work with Elastic versions < 5.
-
-
 # Features
 
 - [x] drop in modules for: reader, parser, and elasticsearch
@@ -103,7 +97,7 @@ Version 0.3 of this project used Logstash in [The Usual Way](https://www.elastic
 
 The second stage was a normalization script that extracted log data from Elasticsearch, normalized it as above, and saved the normalized documents to another index. In that normalization process we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicate log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is ... less reliable than we hoped.
 
-Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it doesn't (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we'd still have issues.
+Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it does not (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we would still have issues.
 
 We decided a simpler solution would be better.
 
@@ -123,7 +117,7 @@ We decided a simpler solution would be better.
 2. Elasticsearch
     * using the bulk API
 
-When saving to ES fails, retry, and don't advance the file bookmark until a retry succeeds. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
+When saving to ES fails, retry, and only advance the file bookmark after a retry succeeds. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
 
 ## Results
 

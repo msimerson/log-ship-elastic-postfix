@@ -1,8 +1,6 @@
 
-# 1.0.0 - 2017-02-12
+# 0.9.7 - 2015-12-09
 
-- renamed `_id` fields to `id`, for elasticsearch 5 compat
-    - if you need ES < 5, use v0.9.5
 - improved config file selection and loading
 - save to parent index (if defined and available)
 - moved startReader() into new function
