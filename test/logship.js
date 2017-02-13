@@ -56,14 +56,16 @@ describe('log-ship-elastic-postfix', function () {
           {
             qid: '3mfHGL1r9gzyQP',
             host: 'mx12',
-          events:
-          [ { date: '2017-07-26T04:18:34-07:00', action: 'queued' },
-          { to: 'system',
-            relay: '127.0.0.2[127.0.0.2]:25',
-            dsn: '2.0.0',
-            status: 'sent (250 Queued! (#2.0.0))',
-            date: '2017-07-26T04:18:34-07:00' },
-            { date: '2017-07-26T04:18:34-07:00', action: 'removed' } ],
+            events: [
+              { date: '2017-07-26T04:18:34-07:00', action: 'queued' },
+              {
+                to: 'system',
+                relay: '127.0.0.2[127.0.0.2]:25',
+                dsn: '2.0.0',
+                status: 'sent (250 Queued! (#2.0.0))',
+                date: '2017-07-26T04:18:34-07:00' },
+              { date: '2017-07-26T04:18:34-07:00', action: 'removed' }
+            ],
             date: '2017-07-26T04:18:34-07:00',
             isFinal: true,
             from: 'system',

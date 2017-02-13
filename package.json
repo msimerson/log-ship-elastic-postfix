@@ -26,15 +26,13 @@
     "safe-log-reader": ">=0.9.9"
   },
   "devDependencies": {
-    "grunt": "*",
-    "grunt-eslint": "*",
-    "grunt-mocha-test": "*",
-    "grunt-version-check": "*",
+    "eslint": "*",
     "mocha": "*"
   },
   "license": "BSD-2-Clause",
   "scripts": {
     "start": "node server.js",
+    "lint":  "./node_modules/.bin/eslint *.js lib/*.js test/*.js",
     "test": "NODE_ENV=test mocha"
   }
 }
