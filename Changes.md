@@ -1,4 +1,9 @@
 
+# 1.0.0 - 2017-02-12
+
+- renamed `_id` fields to `id`, for elasticsearch 5 compat
+    - if you need ES < 5, use v0.9.5
+
 # 0.9.7 - 2015-12-09
 
 - improved config file selection and loading

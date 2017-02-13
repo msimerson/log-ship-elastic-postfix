@@ -78,6 +78,12 @@ With a custom config directory:
     node server.js -config ~/etc/
 
 
+# Versions
+
+- For Elastic v5, use at least version 1.0.0 of this module.
+- Versions of log-ship-elastic-postfix < 1.0.0 work with Elastic versions < 5.
+
+
 # Features
 
 - [x] drop in modules for: reader, parser, and elasticsearch
