@@ -17,7 +17,7 @@ describe('log-ship-elastic-postfix', function () {
       done();
     });
 
-    if (/(?:travis|worker|dev-test)/.test(hostName)) {
+    if (/(?:travis|worker|dev-test|testing-docker)/.test(hostName)) {
       // gotta have ES available to test these...
 
       before(function (done) {
@@ -94,7 +94,7 @@ describe('log-ship-elastic-postfix', function () {
 
     }
     else {
-      it.skip('needs elasticsearch available', function (done) {
+      it.skip('needs elasticsearch available: ' + hostName, function (done) {
         done();
       });
     }

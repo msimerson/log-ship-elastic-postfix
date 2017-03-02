@@ -24,7 +24,7 @@ Into this:
 
 ````json
 {
-    "qid": "3mfHGL1r9gzyQP",
+    "id": "3mfHGL1r9gzyQP",
     "host": "mx12",
     "events": [
       {
@@ -95,15 +95,15 @@ With a custom config directory:
 
 Version 0.3 of this project used Logstash in [The Usual Way](https://www.elastic.co/guide/en/logstash/current/deploying-and-scaling.html), to ship logs to Elasticsearch and do basic line parsing.
 
-The second stage was a normalizion script that extracted log data from Elasticsearch, normalized it as above, and saved the normalized documents to another index. In that normalizion process we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicate log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is ... less reliable than we hoped.
+The second stage was a normalization script that extracted log data from Elasticsearch, normalized it as above, and saved the normalized documents to another index. In that normalization process we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicate log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is ... less reliable than we hoped.
 
-Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it doesn't (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we'd still have issues.
+Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it does not (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we would still have issues.
 
-Instead, we decided a simpler solution would be better.
+We decided a simpler solution would be better.
 
 ## Thoughts
 
-* Logs are *already* safely queued on disk. Queueing them again is a bizarre (and expensive) "solution" to the "Logstash eats logs" problem.
+* Logs are *already* safely queued on disk. Queueing them again is an expensive "solution" to the "Logstash eats logs" problem.
 * Postfix logs, where a single message has 4+ log entries, Logstash is insufficient for assembling lines into a document, requiring extensive post-processing.
 
 ## Instead
@@ -115,8 +115,9 @@ Instead, we decided a simpler solution would be better.
     * applies updated log entries against matching / new docs
     * saves to...
 2. Elasticsearch
+    * using the bulk API
 
-When saving to ES fails, retry, and don't advance the bookmark until a retry succeeds. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
+When saving to ES fails, retry, and only advance the file bookmark after a retry succeeds. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
 
 ## Results
 

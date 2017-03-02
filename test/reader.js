@@ -11,7 +11,7 @@ describe('log-ship-elastic-postfix', function () {
   describe('reader', function () {
 
     // these don't load unless an ES connection is available
-    if (/(?:travis|worker|dev-test)/.test(hostName)) {
+    if (/(?:travis|worker|dev-test|testing-docker)/.test(hostName)) {
 
       it('should load', function (done) {
         assert.ok(shipper.reader);

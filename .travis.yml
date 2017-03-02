@@ -13,7 +13,15 @@ matrix:
 #       - node_js: iojs
     fast_finish: true
 
+addons:
+  apt:
+    sources:
+      - elasticsearch-2.x
+    packages:
+      elasticsearch
+
 services:
+    - redis-server
     - elasticsearch
 
 # wait for elasticsearch to start up
@@ -21,9 +29,13 @@ before_script:
     - chmod -w ./test/spool/nowrite
     - sleep 12
 
+script:
+    - npm run lint
+    - npm test
+
 after_success:
     - npm install istanbul codecov
     - NODE_ENV=cov ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- -R spec
-    - cat ./coverage/coverage.json | ./node_modules/.bin/codecov
+    - ./node_modules/.bin/codecov
 
 sudo: false
