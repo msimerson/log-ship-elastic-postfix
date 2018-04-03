@@ -26,9 +26,9 @@ describe('log-ship-elastic-postfix', function () {
           date: '2018-07-26T04:18:34-07:00'
         },
         util.inspect(shipper.queue[0], { depth: null })
-        );
+      );
       done();
-    });
+    })
 
     it('ignores other lines', function (done) {
       var notPostfixLine =
@@ -39,8 +39,8 @@ describe('log-ship-elastic-postfix', function () {
         util.inspect(shipper.queue[1], { depth: null })
       );
       done();
-    });
-  });
+    })
+  })
 
   describe('updatePfDocs', function () {
 
@@ -74,9 +74,9 @@ describe('log-ship-elastic-postfix', function () {
             delays: '0.13/0/0.23/0.16'
           },
           util.inspect(shipper.pfDocs['3mfHGL1r9gzyQP'], { depth: null })
-          );
+        );
         done();
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

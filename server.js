@@ -5,7 +5,7 @@ const logship  = require('./lib/logship');
 // if adding any more CLI args, switch to using nopt
 let cfgDir;
 if (process.argv[2] &&
-  /^\-c/.test(process.argv[2]) &&
+  /^-c/.test(process.argv[2]) &&
   process.argv[3]) {
   cfgDir = process.argv[3];
   logger.info('using config dir: ' + cfgDir);
