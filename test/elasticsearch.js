@@ -16,13 +16,14 @@ describe('elasticsearch', function () {
 
   if (/(?:travis|worker|dev-test|testing-docker)/.test(hostName)) {
     // need ES available to test these...
+    const indexName = 'postfix-2017-11-16';
 
     before(function (done) {
       var pfDoc = path.resolve('test', 'fixtures', 'postfix.json');
       fs.readFile(pfDoc, function (err) {
         if (err) return done(err);
         shipper.elastic.update({
-          index: 'postfix-2017-11-16',
+          index: indexName,
           type: 'postfix',
           id: '3p04tw2SxSz4w6c',
           body: pfDoc,
@@ -40,7 +41,6 @@ describe('elasticsearch', function () {
         if (err) return done(err);
         indexMap = JSON.parse(data);
         // console.log(indexMap);
-        const indexName = 'postfix-orphan-2018-04-03';
 
         shipper.elastic.indices.delete({ index: indexName }, function () {
           console.log(arguments);
@@ -51,50 +51,48 @@ describe('elasticsearch', function () {
 
             shipper.elastic.indices.putMapping({
               index: indexMap.template,
-              type: indexMap.template,
+              type: 'postfix',
               body: indexMap.mappings,
-            }, function (err) {
+            },
+            function (err) {
               if (err) console.error(err);
               console.log(arguments);
               // assert.ifError(err);
               // other tests are running, so currently
               // stored mapping may conflict
               done();
-            });
-          });
-        });
-      });
-    });
+            })
+          })
+        })
+      })
+    })
 
     it('connects to configured ES host', function (done) {
 
-      shipper.elastic.ping({
-        // ping usually has a 3000ms timeout
-        // requestTimeout: Infinity,
-      }, function (error) {
+      shipper.elastic.ping({}, function (error) {
         if (error) {
           return done('elasticsearch cluster is down!');
         }
         done(error, 'All is well');
-      });
-    });
+      })
+    })
 
     it.skip('populatePfdocsFromEs: does', function (done) {
       done();
-    });
+    })
 
     it.skip('saveResultsToEs saves pfDocs to ES', function (done) {
       done();
-    });
+    })
 
     it.skip('doQueue: flushes queue to ES', function (done) {
       done();
-    });
+    })
 
   }
   else {
     it.skip('needs elasticsearch available: ' + hostName, function (done) {
       done();
-    });
+    })
   }
-});
+})
