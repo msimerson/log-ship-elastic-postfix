@@ -1,7 +1,7 @@
 language: node_js
 node_js:
-    - "4"
     - "6"
+    - "8"
 
 os:
     - linux
@@ -16,7 +16,7 @@ matrix:
 addons:
   apt:
     sources:
-      - elasticsearch-2.x
+      # - elasticsearch-2.x
     packages:
       elasticsearch
 

@@ -22,7 +22,7 @@ Jul 26 04:18:34 mx12 postfix/qmgr[28761]: 3mfHGL1r9gzyQP: removed
 
 Into this:
 
-````json
+```json
 {
     "id": "3mfHGL1r9gzyQP",
     "host": "mx12",
@@ -53,7 +53,7 @@ Into this:
     "delay": "0.53",
     "delays": "0.13/0/0.23/0.16"
   }
-  ````
+```
 
 
 # How it Works
@@ -129,11 +129,11 @@ When saving to ES fails, retry, and only advance the file bookmark after a retry
 <sub>Copyright 2015 by eFolder, Inc.</sub>
 
 
-[ci-img]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix.svg
-[ci-url]: https://travis-ci.org/DoubleCheck/log-ship-elastic-postfix
-[cov-img]: https://codecov.io/github/DoubleCheck/log-ship-elastic-postfix/coverage.svg
-[cov-url]: https://codecov.io/github/DoubleCheck/log-ship-elastic-postfix
-[clim-img]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix/badges/gpa.svg
-[clim-url]: https://codeclimate.com/github/DoubleCheck/log-ship-elastic-postfix
+[ci-img]: https://travis-ci.org/msimerson/log-ship-elastic-postfix.svg
+[ci-url]: https://travis-ci.org/msimerson/log-ship-elastic-postfix
+[cov-img]: https://codecov.io/github/msimerson/log-ship-elastic-postfix/coverage.svg
+[cov-url]: https://codecov.io/github/msimerson/log-ship-elastic-postfix
+[clim-img]: https://codeclimate.com/github/msimerson/log-ship-elastic-postfix/badges/gpa.svg
+[clim-url]: https://codeclimate.com/github/msimerson/log-ship-elastic-postfix
 [npm-img]: https://nodei.co/npm/log-ship-elastic-postfix.png
 [npm-url]: https://www.npmjs.com/package/log-ship-elastic-postfix

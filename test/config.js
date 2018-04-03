@@ -1,5 +1,3 @@
-'use strict';
-
 var assert  = require('assert');
 
 var logship  = require('../lib/logship');
@@ -20,6 +18,6 @@ describe('log-ship-elastic-postfix', function () {
         assert.ok(shipper.cfg[s]);
       });
       done();
-    });
-  });
-});
+    })
+  })
+})
