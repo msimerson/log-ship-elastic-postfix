@@ -40,17 +40,18 @@ describe('elasticsearch', function () {
         if (err) return done(err);
         indexMap = JSON.parse(data);
         // console.log(indexMap);
+        const indexName = 'postfix-orphan-2018-04-03';
 
-        shipper.elastic.indices.delete({ index: indexMap.template }, function () {
+        shipper.elastic.indices.delete({ index: indexName }, function () {
           console.log(arguments);
           // if (err) console.error(err); // may not exist, ignore error
-          shipper.elastic.indices.create({ index: indexMap.template }, function () {
+          shipper.elastic.indices.create({ index: indexName }, function () {
             console.log(arguments);
             // if (err) console.error(err); // may already exist
 
             shipper.elastic.indices.putMapping({
-              index: 'postfix-orphan',
-              type: 'postfix',
+              index: indexMap.template,
+              type: indexMap.template,
               body: indexMap.mappings,
             }, function (err) {
               if (err) console.error(err);
