@@ -49,8 +49,8 @@ describe('elasticsearch', function () {
             // if (err) console.error(err); // may already exist
 
             shipper.elastic.indices.putMapping({
-              index: indexMap.template,
-              type: indexMap.template,
+              index: 'postfix-orphan',
+              type: 'postfix',
               body: indexMap.mappings,
             }, function (err) {
               if (err) console.error(err);
