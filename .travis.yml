@@ -16,7 +16,7 @@ matrix:
 addons:
   apt:
     sources:
-      - elasticsearch-2.x
+      # - elasticsearch-2.x
     packages:
       elasticsearch
 
