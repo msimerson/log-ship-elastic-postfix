@@ -59,7 +59,7 @@ Into this:
 # How it Works
 
 - read a batch of log entries
-- parse lines with [postfix-parser](https://github.com/DoubleCheck/postfix-parser)
+- parse lines with [postfix-parser](https://github.com/msimerson/postfix-parser)
 - fetch matching docs from Elasticsearch
 - update/create normalized docs
 - save new/updated docs to Elasticsearch
