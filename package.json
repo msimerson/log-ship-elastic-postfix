@@ -9,13 +9,13 @@
     "elasticsearch",
     "log ship"
   ],
-  "homepage": "https://github.com/DoubleCheck/log-ship-elastic-postfix",
+  "homepage": "https://github.com/msimerson/log-ship-elastic-postfix",
   "bugs": {
-    "url": "https://github.com/DoubleCheck/log-ship-elastic-postfix/issues"
+    "url": "https://github.com/msimerson/log-ship-elastic-postfix/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/DoubleCheck/log-ship-elastic-postfix.git"
+    "url": "git://github.com/msimerson/log-ship-elastic-postfix.git"
   },
   "dependencies": {
     "elasticsearch": "*",
