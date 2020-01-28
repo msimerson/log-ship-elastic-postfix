@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "eslint": "^5",
-    "mocha": "*"
+    "mocha": "^6"
   },
   "license": "BSD-2-Clause",
   "scripts": {
