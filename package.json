@@ -26,7 +26,7 @@
     "safe-log-reader": ">=0.9.9"
   },
   "devDependencies": {
-    "eslint": "*",
+    "eslint": "^5",
     "mocha": "*"
   },
   "license": "BSD-2-Clause",
