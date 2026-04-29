@@ -7,7 +7,6 @@
 
 Parses postfix, rspamd, and rmilter log files and ships them to Elasticsearch as normalized documents.
 
-
 # Overview
 
 Turns this:
@@ -64,19 +63,23 @@ Into this:
 - update/create normalized docs
 - save new/updated docs to Elasticsearch
 
-
 # Install
 
-    npm i log-ship-elastic-postfix
+```sh
+npm i log-ship-elastic-postfix
+```
 
 Edit log-ship-elastic-postfix.ini, then launch with:
 
-    node server.js
+```sh
+node server.js
+```
 
 With a custom config directory:
 
-    node server.js -config ~/etc/
-
+```sh
+node server.js -config ~/etc/
+```
 
 # Features
 
@@ -90,47 +93,10 @@ With a custom config directory:
 - [ ] winston naming syntax (app.log1, app.log2, etc.)
 - [ ] email alerts for unrecoverable errors
 
-
-# But, Logstash?!
-
-Version 0.3 of this project used Logstash in [The Usual Way](https://www.elastic.co/guide/en/logstash/current/deploying-and-scaling.html), to ship logs to Elasticsearch and do basic line parsing.
-
-The second stage was a normalization script that extracted log data from Elasticsearch, normalized it as above, and saved the normalized documents to another index. In that normalization process we discovered millions of missing logs (~30% of log lines) and millions (~10%) of duplicate log entries. In poring over the logs for Logstash Forwarder, Logstash, and Elasticsearch, observing the error messages, correlating our experience with open GitHub Issues in both Logstash and Logstash Forwarder, we came to realize that the Logstash pipeline is ... less reliable than we hoped.
-
-Logstash is supposed to apply back-pressure on the pipeline to prevent overrunning the parser or the Elasticsearch indexer. In reality, it does not (the docs *almost* admit this), recommending making the Logstash pipeline **more** complicated by adding a queue. The 8 separate bugs (all open issues) we ran into with Logstash and LSF convinced us even with a queue, we would still have issues.
-
-We decided a simpler solution would be better.
-
-## Thoughts
-
-* Logs are *already* safely queued on disk. Queueing them again is an expensive "solution" to the "Logstash eats logs" problem.
-* Postfix logs, where a single message has 4+ log entries, Logstash is insufficient for assembling lines into a document, requiring extensive post-processing.
-
-## Instead
-
-1. log-ship-elastic-postfix reads locally generated log files with:
-    * [safe-log-reader](https://www.npmjs.com/package/safe-log-reader)
-    * parses log lines with [postfix-parser](https://www.npmjs.com/package/postfix-parser)
-    * retrieves matching docs from ES
-    * applies updated log entries against matching / new docs
-    * saves to...
-2. Elasticsearch
-    * using the bulk API
-
-When saving to ES fails, retry, and only advance the file bookmark after a retry succeeds. By checking for the existence of documents matches *first*, we avoid duplicates in the case of "300 of your 1024 batch were saved" issues.
-
-## Results
-
-* Way, way, way faster.
-* Uses far less ES storage.
-* Far less ES traffic
-
-
 <sub>Copyright 2015 by eFolder, Inc.</sub>
 
-
-[ci-img]: https://travis-ci.org/msimerson/log-ship-elastic-postfix.svg
-[ci-url]: https://travis-ci.org/msimerson/log-ship-elastic-postfix
+[ci-img]: https://github.com/msimerson/log-ship-elastic-postfix/actions/workflows/test.yml/badge.svg
+[ci-url]: https://github.com/msimerson/log-ship-elastic-postfix/actions/workflows/test.yml
 [cov-img]: https://codecov.io/github/msimerson/log-ship-elastic-postfix/coverage.svg
 [cov-url]: https://codecov.io/github/msimerson/log-ship-elastic-postfix
 [clim-img]: https://codeclimate.com/github/msimerson/log-ship-elastic-postfix/badges/gpa.svg

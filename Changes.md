@@ -1,4 +1,10 @@
 
+# 1.0.0 - 2026-04-29
+
+- doc(README): updated
+- meta: declare files in package.json
+- dep(eslint): install on-demand
+
 # 0.9.8 - 2026-04-29
 
 - modernized and cleaned up
@@ -35,4 +41,3 @@
 - empty pfdocs after commit failure
 
 # 0.9.0 - 2015-08-06
-

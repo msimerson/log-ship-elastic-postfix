@@ -1,13 +1,20 @@
 {
   "name": "log-ship-elastic-postfix",
   "description": "Ship normalized Postfix logs to Elasticsearch",
-  "version": "0.9.8",
+  "version": "1.0.0",
   "private": false,
   "keywords": [
     "log",
     "postfix",
     "elasticsearch",
     "log ship"
+  ],
+  "files": [
+    "Changes.md",
+    "index-map-template.json",
+    "lib",
+    "server.js",
+    "log-ship-elastic-postfix.ini"
   ],
   "homepage": "https://github.com/msimerson/log-ship-elastic-postfix",
   "bugs": {
@@ -24,14 +31,10 @@
     "redis": "^5.12.1",
     "safe-log-reader": "^1.0.8"
   },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.2.1",
-    "globals": "^17.5.0"
-  },
+  "devDependencies": {},
   "license": "BSD-2-Clause",
   "scripts": {
-    "lint": "npx eslint .",
+    "lint": "npm install @eslint/js eslint globals && npx eslint .",
     "start": "node server.js",
     "test": "node test-runner.js",
     "test:coverage": "NODE_ENV=test node --test --experimental-test-coverage",

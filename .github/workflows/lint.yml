@@ -12,6 +12,4 @@ jobs:
     steps:
       - uses: actions/setup-node@v6
       - uses: actions/checkout@v6
-      - run: npm install eslint @eslint/js globals
       - run: npm run lint
-
