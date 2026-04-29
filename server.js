@@ -1,6 +1,8 @@
 
-const logger   = require('./lib/logger');
-const logship  = require('./lib/logship');
+'use strict';
+
+const logger = require('./lib/logger');
+const logship = require('./lib/logship');
 
 // if adding any more CLI args, switch to using nopt
 let cfgDir;
@@ -11,19 +13,15 @@ if (process.argv[2] &&
   logger.info('using config dir: ' + cfgDir);
 }
 
-const shipper  = logship.createShipper(cfgDir);
+const shipper = logship.createShipper(cfgDir);
 
-/*
-process.on('SIGHUP', function () {
-  logger.info('SIGHUP: reloading config');
-});
-*/
-process.on('SIGINT', function() {     // Control-C
+process.on('SIGINT', () => {     // Control-C
   logger.info('\nSIGINT received (Ctrl-C)');
   shipper.shutdown();
-})
+});
 
-process.on('SIGTERM', function () {   // kill $PID
+process.on('SIGTERM', () => {   // kill $PID
   logger.info('\nSIGTERM received');
   shipper.shutdown();
-})
+});
+

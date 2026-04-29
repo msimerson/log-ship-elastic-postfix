@@ -1,78 +1,106 @@
+'use strict';
 
-var assert   = require('assert');
-var fs       = require('fs');
-var path     = require('path');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { describe, it, before, after } = require('node:test');
 
-var logship  = require('../lib/logship');
-var spool    = require('../lib/spool');
+const logship = require('../lib/logship');
+const spool = require('../lib/spool');
 
-describe('log-ship-elastic-postfix', function () {
-  var shipper = logship.createShipper('./test');
+describe('log-ship-elastic-postfix', () => {
+  const shipper = logship.createShipper('./test');
 
-  before(function (done) {
-    fs.chmod(path.resolve('test','spool','nowrite'), '0555', function (err) {
-      if (err) console.error(err);
-      done();
+  before(() => {
+    return new Promise((resolve) => {
+      fs.chmod(path.resolve('test', 'spool', 'nowrite'), '0555', (err) => {
+        if (err) console.error(err);
+        resolve();
+      });
     });
   });
 
-  describe('spool', function () {
-    it('spool dir is defined', function (done) {
+  after(() => {
+    if (shipper) {
+      if (shipper.watchdogTimer) {
+        clearTimeout(shipper.watchdogTimer);
+      }
+      if (shipper.elastic) {
+        if (typeof shipper.elastic.close === 'function') {
+          try {
+            shipper.elastic.close();
+          }
+          catch (_) {
+            // ignore
+          }
+        }
+        shipper.elastic = null;
+      }
+    }
+    if (global.gc) {
+      global.gc();
+    }
+  });
+
+  describe('spool', () => {
+    it('spool dir is defined', () => {
       assert.ok(shipper.cfg.main.spool);
-      done();
     });
 
-    it('spool dir is writable', function (done) {
-      spool.isWritable(shipper.cfg.main.spool, function (err) {
-        assert.ifError(err);
-        done();
+    it('spool dir is writable', () => {
+      return new Promise((resolve, reject) => {
+        spool.isWritable(shipper.cfg.main.spool, (err) => {
+          if (err) reject(err);
+          else {
+            assert.ifError(err);
+            resolve();
+          }
+        });
       });
     });
 
-    it('errs if spool dir is not writable', function (done) {
-      var spoolDir = path.resolve('./test', 'spool','nowrite');
-      spool.isValidDir(spoolDir, function (err) {
-        assert.equal(err.code, 'EACCES');
-        done();
+    it('errs if spool dir is not writable', () => {
+      return new Promise((resolve) => {
+        const spoolDir = path.resolve('./test', 'spool', 'nowrite');
+        spool.isValidDir(spoolDir, (err) => {
+          assert.strictEqual(err.code, 'EACCES');
+          resolve();
+        });
       });
     });
   });
 
-  describe('fs utilities', function () {
-    it('isDirectory reports true for dir', function (done) {
-      assert.equal(
+  describe('fs utilities', () => {
+    it('isDirectory reports true for dir', () => {
+      assert.strictEqual(
         spool.isDirectory(path.resolve('./test', 'spool')), true);
-      done();
     });
 
-    it('isDirectory reports false for file', function (done) {
-      var spoolFile = path.resolve('./test', 'spool','file');
-      assert.equal(spool.isDirectory(spoolFile), false);
-      done();
+    it('isDirectory reports false for file', () => {
+      const spoolFile = path.resolve('./test', 'spool', 'file');
+      assert.strictEqual(spool.isDirectory(spoolFile), false);
     });
 
-    it('isWritable reports true for writable dir', function (done) {
-      var spoolDir = path.resolve('./test', 'spool');
-      assert.equal(spool.isWritable(spoolDir), true);
-      done();
+    it('isWritable reports true for writable dir', () => {
+      const spoolDir = path.resolve('./test', 'spool');
+      assert.strictEqual(spool.isWritable(spoolDir), true);
     });
 
-    it('isWritable reports false for non-writable dir', function (done) {
-      var spoolDir = path.resolve('./test', 'spool', 'nowrite');
-      assert.equal(spool.isWritable(spoolDir), false);
-      done();
+    it('isWritable reports false for non-writable dir', () => {
+      const spoolDir = path.resolve('./test', 'spool', 'nowrite');
+      assert.strictEqual(spool.isWritable(spoolDir), false);
     });
 
-    it('isWritablePreV12 reports true for writable dir', function (done) {
-      var spoolDir = path.resolve('./test', 'spool');
-      assert.equal(spool.isWritablePreV12(spoolDir), true);
-      done();
+    it('isWritablePreV12 reports true for writable dir', () => {
+      const spoolDir = path.resolve('./test', 'spool');
+      assert.strictEqual(spool.isWritablePreV12(spoolDir), true);
     });
 
-    it('isWritablePreV12 reports false for non-writable dir', function (done) {
-      var spoolDir = path.resolve('./test', 'spool', 'nowrite');
-      assert.equal(spool.isWritablePreV12(spoolDir), false);
-      done();
+    it('isWritablePreV12 reports false for non-writable dir', () => {
+      const spoolDir = path.resolve('./test', 'spool', 'nowrite');
+      assert.strictEqual(spool.isWritablePreV12(spoolDir), false);
     });
   });
 });
+
+

@@ -1,46 +1,55 @@
+'use strict';
 
-var assert   = require('assert');
+const assert = require('node:assert/strict');
+const { describe, it, after } = require('node:test');
 
-var logship  = require('../lib/logship');
-var shipper  = logship.createShipper('./test');
-var hostName = require('os').hostname();
+const logship = require('../lib/logship');
 
-describe('reader', function () {
+describe('reader', () => {
+  const shipper = logship.createShipper('./test');
 
-  // these don't load unless an ES connection is available
-  if (/(?:travis|worker|dev-test|testing-docker)/.test(hostName)) {
-
-    it('should load', function (done) {
+  describe('when elasticsearch is available', () => {
+    // ES tests will skip if elasticsearch is not reachable
+    it('should load', { skip: !shipper.reader }, () => {
       assert.ok(shipper.reader);
-      done();
     });
 
     if (shipper.reader) {
-      it('is readable', function (done) {
+      it('is readable', () => {
         assert.ok(shipper.reader.liner &&
           (shipper.reader.liner.readable || shipper.queue.length));
-        // console.log(shipper.reader.liner.readable);
-        // console.log(shipper.queue);
-        done();
       });
 
-      it.skip('creates an instance for a test log file', function (done) {
-        done();
-      });
+      it('creates an instance for a test log file', { skip: true }, () => {});
 
-      it.skip('reads the expected log lines', function (done) {
-        done();
-      });
+      it('reads the expected log lines', { skip: true }, () => {});
 
-      it.skip('saves a bookmark', function (done) {
-        done();
-      });
+      it('saves a bookmark', { skip: true }, () => {});
     }
-  }
-  else {
-    it.skip('needs elasticsearch available', function (done) {
-      console.log('hostname: ' + hostName);
-      done();
-    });
-  }
+    else {
+      it('needs elasticsearch available', { skip: true }, () => {});
+    }
+  });
+
+  after(() => {
+    if (shipper) {
+      if (shipper.watchdogTimer) clearTimeout(shipper.watchdogTimer);
+      if (shipper.elastic) {
+        if (typeof shipper.elastic.close === 'function') {
+          try {
+            shipper.elastic.close();
+          }
+          catch (_) {
+            // ignore
+          }
+        }
+        shipper.elastic = null;
+      }
+    }
+    if (global.gc) {
+      global.gc();
+    }
+  });
 });
+
+

@@ -1,0 +1,17 @@
+name: Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - run: npm install eslint @eslint/js globals
+      - run: npm run lint
+

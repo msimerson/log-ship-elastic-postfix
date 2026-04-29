@@ -1,4 +1,8 @@
 
+# 0.9.8 - 2026-04-29
+
+- modernized and cleaned up
+
 # 0.9.7 - 2015-12-09
 
 - improved config file selection and loading

@@ -1,98 +1,106 @@
+'use strict';
 
-var assert   = require('assert');
-var fs       = require('fs');
-var path     = require('path');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { describe, it, before, after } = require('node:test');
 
-var logship  = require('../lib/logship');
-var shipper  = logship.createShipper('./test');
-var hostName = require('os').hostname();
+const logship = require('../lib/logship');
 
-describe('elasticsearch', function () {
+describe('elasticsearch', () => {
+  let shipper;
 
-  it('loads the specified elasticsearch module', function (done) {
-    assert.ok(shipper.elastic);
-    done();
+  before(() => {
+    shipper = logship.createShipper('./test');
   });
 
-  if (/(?:travis|worker|dev-test|testing-docker)/.test(hostName)) {
-    // need ES available to test these...
+  after(() => {
+    if (shipper) {
+      if (shipper.watchdogTimer) clearTimeout(shipper.watchdogTimer);
+      if (shipper.elastic) {
+        if (typeof shipper.elastic.close === 'function') {
+          try {
+            shipper.elastic.close();
+          }
+          catch (_) {
+            // ignore
+          }
+        }
+        shipper.elastic = null;
+      }
+    }
+    if (global.gc) {
+      global.gc();
+    }
+  });
+
+  it('loads the specified elasticsearch module', () => {
+    assert.ok(shipper.elastic);
+  });
+
+  describe('when elasticsearch is available', () => {
     const indexName = 'postfix-2017-11-16';
 
-    before(function (done) {
-      var pfDoc = path.resolve('test', 'fixtures', 'postfix.json');
-      fs.readFile(pfDoc, function (err) {
-        if (err) return done(err);
-        shipper.elastic.update({
+    before(async () => {
+      try {
+        // Test if ES is available by attempting to ping
+        await shipper.elastic.ping();
+
+        const pfDocPath = path.resolve('test', 'fixtures', 'postfix.json');
+        const pfDocData = await fs.readFile(pfDocPath, 'utf8');
+        // Use index instead of update to create the document if it doesn't exist
+        await shipper.elastic.index({
           index: indexName,
-          type: 'postfix',
           id: '3p04tw2SxSz4w6c',
-          body: pfDoc,
+          document: JSON.parse(pfDocData),
         });
-        done();
-      });
+        // Refresh index to make document immediately searchable
+        await shipper.elastic.indices.refresh({ index: indexName });
+      }
+      catch (err) {
+        // Skip tests if Elasticsearch is not available
+        throw new Error(`Elasticsearch not available: ${err.message}`, { cause: err });
+      }
     });
 
-    this.timeout(4000);
-    it('can store an index map template', function (done) {
-      var filePath = path.resolve('index-map-template.json');
-      var indexMap;
+    it('can store an index map template', async () => {
+      const filePath = path.resolve('index-map-template.json');
+      const data = await fs.readFile(filePath, 'utf8');
+      const indexMap = JSON.parse(data);
 
-      fs.readFile(filePath, function (err, data) {
-        if (err) return done(err);
-        indexMap = JSON.parse(data);
-        // console.log(indexMap);
+      // Delete existing index (may not exist, ignore error)
+      try {
+        await shipper.elastic.indices.delete({ index: indexName });
+      }
+      catch (_) {
+        // ignore
+      }
 
-        shipper.elastic.indices.delete({ index: indexName }, function () {
-          console.log(arguments);
-          // if (err) console.error(err); // may not exist, ignore error
-          shipper.elastic.indices.create({ index: indexName }, function () {
-            console.log(arguments);
-            // if (err) console.error(err); // may already exist
+      // Create index
+      await shipper.elastic.indices.create({ index: indexName });
 
-            shipper.elastic.indices.putMapping({
-              index: indexMap.template,
-              type: 'postfix',
-              body: indexMap.mappings,
-            },
-            function (err) {
-              if (err) console.error(err);
-              console.log(arguments);
-              // assert.ifError(err);
-              // other tests are running, so currently
-              // stored mapping may conflict
-              done();
-            })
-          })
-        })
-      })
-    })
+      // Put mapping
+      try {
+        await shipper.elastic.indices.putMapping({
+          index: indexMap.template,
+          properties: indexMap.mappings.properties,
+        });
+      }
+      catch (_) {
+        // Other tests may conflict with mapping, so don't fail
+      }
+    });
 
-    it('connects to configured ES host', function (done) {
+    it('connects to configured ES host', async () => {
+      await shipper.elastic.ping();
+    });
 
-      shipper.elastic.ping({}, function (error) {
-        if (error) {
-          return done('elasticsearch cluster is down!');
-        }
-        done(error, 'All is well');
-      })
-    })
+    it('populatePfdocsFromEs: does', { skip: true }, () => {});
 
-    it.skip('populatePfdocsFromEs: does', function (done) {
-      done();
-    })
+    it('saveResultsToEs saves pfDocs to ES', { skip: true }, () => {});
 
-    it.skip('saveResultsToEs saves pfDocs to ES', function (done) {
-      done();
-    })
+    it('doQueue: flushes queue to ES', { skip: true }, () => {});
+  });
+});
 
-    it.skip('doQueue: flushes queue to ES', function (done) {
-      done();
-    })
 
-  }
-  else {
-    it.skip('needs elasticsearch available: ' + hostName, function (done) {
-      done();
-    })
-  }
-})
