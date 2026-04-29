@@ -5,7 +5,7 @@
 
 # Ship Postfix Logs to Elasticsearch
 
-Parses postfix log files from log files into a normalized JSON document and saves them to Elasticsearch.
+Parses postfix, rspamd, and rmilter log files and ships them to Elasticsearch as normalized documents.
 
 
 # Overview
