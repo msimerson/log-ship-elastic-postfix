@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22, 24]
+        elasticsearch-version: [8.11.3]
+      fail-fast: false
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:${{ matrix.elasticsearch-version }}
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          xpack.security.enrollment.enabled: false
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd="curl http://localhost:9200/_cluster/health"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: chmod -w ./test/spool/nowrite
+      - run: npm test

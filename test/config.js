@@ -1,23 +1,33 @@
-var assert  = require('assert');
+'use strict';
 
-var logship  = require('../lib/logship');
-// var hostName = require('os').hostname();
+const assert = require('node:assert/strict');
+const { describe, it, after } = require('node:test');
 
-describe('log-ship-elastic-postfix', function () {
-  var shipper = logship.createShipper('./test');
+const logship = require('../lib/logship');
 
-  describe('config', function () {
-    it('finds a log-ship-elastic-postfix.ini', function (done) {
+describe('log-ship-elastic-postfix', () => {
+  const shipper = logship.createShipper('./test');
+
+  after(() => {
+    if (shipper.watchdogTimer) {
+      clearTimeout(shipper.watchdogTimer);
+    }
+    if (shipper.elastic && typeof shipper.elastic.close === 'function') {
+      shipper.elastic.close();
+    }
+  });
+
+  describe('config', () => {
+    it('finds a log-ship-elastic-postfix.ini', () => {
       assert.ok(shipper);
-      done();
     });
 
-    it('config has required sections', function (done) {
-      // console.log(cfg);
-      ['main', 'elastic', 'parser', 'reader'].forEach(function (s) {
+    it('config has required sections', () => {
+      ['main', 'elastic', 'parser', 'reader'].forEach((s) => {
         assert.ok(shipper.cfg[s]);
       });
-      done();
-    })
-  })
-})
+    });
+  });
+});
+
+

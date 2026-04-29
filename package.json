@@ -18,21 +18,25 @@
     "url": "git://github.com/msimerson/log-ship-elastic-postfix.git"
   },
   "dependencies": {
-    "elasticsearch": "^16.7.3",
-    "ini": "^5.0.0",
-    "moment-timezone": "^2.30.1",
+    "@elastic/elasticsearch": "^9.3.4",
+    "ini": "^6.0.0",
     "postfix-parser": "^1.1.2",
-    "redis": "^4.7.0",
+    "redis": "^5.12.1",
     "safe-log-reader": "^1.0.8"
   },
   "devDependencies": {
-    "eslint": "^9.21.0",
-    "mocha": "^11.1.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.1",
+    "globals": "^17.5.0"
   },
   "license": "BSD-2-Clause",
   "scripts": {
+    "lint": "npx eslint .",
     "start": "node server.js",
-    "lint":  "npx eslint *.js lib/*.js test/*.js",
-    "test": "NODE_ENV=test mocha"
+    "test": "node test-runner.js",
+    "test:coverage": "NODE_ENV=test node --test --experimental-test-coverage",
+    "test:coverage:lcov": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info",
+    "versions": "npx npm-dep-mgr check",
+    "versions:fix": "npx npm-dep-mgr update"
   }
 }

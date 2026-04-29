@@ -1,0 +1,32 @@
+name: publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v6
+      - run: npm install
+      - run: npm test
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          registry-url: https://registry.npmjs.org/
+          node-version: 24
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: npm publish --access public --provenance
