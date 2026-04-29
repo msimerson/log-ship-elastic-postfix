@@ -18,7 +18,7 @@
     "url": "git://github.com/msimerson/log-ship-elastic-postfix.git"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^9.3.4",
+    "@elastic/elasticsearch": "^8.19.1",
     "ini": "^6.0.0",
     "postfix-parser": "^1.1.2",
     "redis": "^5.12.1",

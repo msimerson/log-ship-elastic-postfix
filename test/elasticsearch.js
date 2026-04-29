@@ -48,11 +48,14 @@ describe('elasticsearch', () => {
 
         const pfDocPath = path.resolve('test', 'fixtures', 'postfix.json');
         const pfDocData = await fs.readFile(pfDocPath, 'utf8');
-        await shipper.elastic.update({
+        // Use index instead of update to create the document if it doesn't exist
+        await shipper.elastic.index({
           index: indexName,
           id: '3p04tw2SxSz4w6c',
-          doc: JSON.parse(pfDocData),
+          document: JSON.parse(pfDocData),
         });
+        // Refresh index to make document immediately searchable
+        await shipper.elastic.indices.refresh({ index: indexName });
       }
       catch (err) {
         // Skip tests if Elasticsearch is not available
